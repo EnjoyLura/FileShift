@@ -1,5 +1,6 @@
 import { Worker } from 'bullmq';
 import { createMockWorker } from './mock.worker.js';
+import { createImageWorker } from './image.worker.js';
 import { logger } from '../utils/logger.js';
 
 // 存储所有 Worker 实例
@@ -16,13 +17,16 @@ export function startAllWorkers() {
   workers.push(mockWorker);
   logger.info('Mock Worker started (queue: file-document)');
 
-  // TODO: Step 5-8 中逐步添加实际 Worker
-  // const imageWorker = createImageWorker();
-  // workers.push(imageWorker);
+  // Image Worker（图片处理）
+  const imageWorker = createImageWorker();
+  workers.push(imageWorker);
+  logger.info('Image Worker started (queue: file-image)');
 
+  // TODO: Step 7-8 中添加 Document Worker
   // const documentWorker = createDocumentWorker();
   // workers.push(documentWorker);
 
+  // TODO: Step 19-21 中添加 Media Worker
   // const mediaWorker = createMediaWorker();
   // workers.push(mediaWorker);
 
