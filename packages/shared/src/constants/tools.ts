@@ -240,6 +240,18 @@ export const ALL_TOOLS: ToolConfig[] = [
   ...DOCUMENT_TOOLS,
   ...IMAGE_TOOLS,
   ...MEDIA_TOOLS,
+  // 开发/测试用 Mock 工具
+  {
+    id: 'mock-tool',
+    name: 'Mock 工具（测试用）',
+    description: '模拟文件处理，用于开发和测试验证',
+    category: ToolCategory.DOCUMENT,
+    pointsCost: 1,
+    vipDiscount: 1.0,
+    maxFileSize: 10 * 1024 * 1024,
+    inputFormats: ['txt', 'pdf', 'jpg', 'png'],
+    outputFormats: ['txt'],
+  },
 ];
 
 // 通过 ID 获取工具配置

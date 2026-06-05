@@ -22,7 +22,7 @@ services:
   redis:
     image: redis:7-alpine
     container_name: fileshift-redis
-    command: redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru
+    command: redis-server --maxmemory 128mb --maxmemory-policy noeviction
     ports:
       - "6379:6379"
     volumes:

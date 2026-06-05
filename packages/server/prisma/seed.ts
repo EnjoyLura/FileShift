@@ -1,9 +1,9 @@
 /**
  * FileShift 数据库种子数据
- * 运行: npx pnpm --filter @fileshift/server prisma:seed
+ * 运行: npx pnpm --filter @fileshift/server exec tsx prisma/seed.ts
  */
 import { PrismaClient } from '@prisma/client';
-import { ALL_TOOLS, ToolCategory } from '@fileshift/shared';
+import { ALL_TOOLS } from '@fileshift/shared';
 
 const prisma = new PrismaClient();
 
@@ -44,6 +44,9 @@ async function seedTools() {
 async function seedPointsPackages() {
   console.log('Seeding points packages...');
 
+  // 清空旧数据后重新插入
+  await prisma.pointsPackage.deleteMany({});
+
   const packages = [
     {
       name: '体验包',
@@ -75,13 +78,7 @@ async function seedPointsPackages() {
     },
   ];
 
-  for (const pkg of packages) {
-    await prisma.pointsPackage.upsert({
-      where: { name: pkg.name },
-      update: pkg,
-      create: pkg,
-    });
-  }
+  await prisma.pointsPackage.createMany({ data: packages });
 
   console.log(`Seeded ${packages.length} points packages`);
 }
@@ -91,7 +88,7 @@ async function seedVipPackages() {
 
   const vipPackages = [
     {
-      type: 'MONTHLY',
+      type: 'MONTHLY' as const,
       name: '月度VIP',
       price: 2990, // ¥29.90
       durationDays: 30,
@@ -99,7 +96,7 @@ async function seedVipPackages() {
       discount: 0.8,
     },
     {
-      type: 'QUARTERLY',
+      type: 'QUARTERLY' as const,
       name: '季度VIP',
       price: 7990, // ¥79.90
       durationDays: 90,
@@ -107,7 +104,7 @@ async function seedVipPackages() {
       discount: 0.8,
     },
     {
-      type: 'YEARLY',
+      type: 'YEARLY' as const,
       name: '年度VIP',
       price: 24990, // ¥249.90
       durationDays: 365,
@@ -116,19 +113,9 @@ async function seedVipPackages() {
     },
   ];
 
-  for (const pkg of vipPackages) {
-    await prisma.vipPackage.upsert({
-      where: { type: pkg.type as 'MONTHLY' | 'QUARTERLY' | 'YEARLY' },
-      update: {
-        name: pkg.name,
-        price: pkg.price,
-        durationDays: pkg.durationDays,
-        monthlyPoints: pkg.monthlyPoints,
-        discount: pkg.discount,
-      },
-      create: pkg as Record<string, unknown>,
-    });
-  }
+  // 清空旧数据后重新插入
+  await prisma.vipPackage.deleteMany({});
+  await prisma.vipPackage.createMany({ data: vipPackages });
 
   console.log(`Seeded ${vipPackages.length} VIP packages`);
 }
