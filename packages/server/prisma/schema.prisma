@@ -1,0 +1,248 @@
+// FileShift 数据库 Schema
+// 文档：https://www.prisma.io/docs/concepts/components/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ 枚举类型 ============
+
+enum UserStatus {
+  ACTIVE
+  BANNED
+  DELETED
+}
+
+enum VipType {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum FileType {
+  INPUT  // 用户上传的原始文件
+  OUTPUT // 处理后的输出文件
+}
+
+enum ToolCategory {
+  DOCUMENT
+  IMAGE
+  AUDIO
+  VIDEO
+}
+
+enum TaskStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum PointsTransactionType {
+  REGISTER_BONUS // 注册赠送
+  SIGN_IN        // 每日签到
+  INVITE_REWARD  // 邀请奖励
+  PURCHASE       // 购买积分
+  CONSUME        // 使用消耗
+  REFUND         // 退还积分
+  VIP_MONTHLY    // VIP月度赠送
+  PROFILE_BONUS  // 完善资料奖励
+}
+
+enum OrderType {
+  POINTS_PACKAGE
+  VIP_SUBSCRIPTION
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  WECHAT_PAY
+  ALIPAY
+}
+
+// ============ 用户表 ============
+model User {
+  id            String    @id @default(uuid())
+  nickname      String    @default("")
+  avatar        String?
+  email         String?   @unique
+  emailVerified Boolean   @default(false) @map("email_verified")
+  phone         String?   @unique
+  phoneVerified Boolean   @default(false) @map("phone_verified")
+  passwordHash  String?   @map("password_hash")
+  wechatOpenid  String?   @unique @map("wechat_openid")
+  wechatUnionid String?   @map("wechat_unionid")
+  points        Int       @default(50) // 新用户默认50积分
+  vipType       VipType?  @map("vip_type")
+  vipExpiresAt  DateTime? @map("vip_expires_at")
+  inviteCode    String    @unique @default(cuid()) @map("invite_code")
+  invitedBy     String?   @map("invited_by")
+  lastSignInAt  DateTime? @map("last_sign_in_at")
+  consecutiveSignInDays Int @default(0) @map("consecutive_sign_in_days")
+  status        UserStatus @default(ACTIVE)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // 关联关系
+  files              File[]
+  tasks              Task[]
+  pointsTransactions PointsTransaction[]
+  orders             Order[]
+
+  @@map("users")
+}
+
+// ============ 文件表 ============
+model File {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  originalName String   @map("original_name")
+  storedName   String   @unique @map("stored_name")
+  mimeType     String   @map("mime_type")
+  size         Int      // 文件大小（字节）
+  storagePath  String   @map("storage_path")
+  fileType     FileType @map("file_type")
+  createdAt    DateTime @default(now()) @map("created_at")
+  expiresAt    DateTime? @map("expires_at")
+
+  // 关联关系
+  user        User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  inputTasks  Task[] @relation("InputFile")
+  outputTasks Task[] @relation("OutputFile")
+
+  @@index([userId, createdAt])
+  @@map("files")
+}
+
+// ============ 工具配置表 ============
+model Tool {
+  id            String       @id
+  name          String
+  description   String
+  category      ToolCategory
+  pointsCost    Int          @map("points_cost")
+  vipDiscount   Float        @default(1.0) @map("vip_discount")
+  maxFileSize   Int          @map("max_file_size")
+  inputFormats  String[]     @map("input_formats")
+  outputFormats String[]     @map("output_formats")
+  enabled       Boolean      @default(true)
+  priority      Int          @default(0)
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  // 关联关系
+  tasks Task[]
+
+  @@map("tools")
+}
+
+// ============ 任务表 ============
+model Task {
+  id             String     @id @default(uuid())
+  userId         String     @map("user_id")
+  toolId         String     @map("tool_id")
+  status         TaskStatus @default(PENDING)
+  inputFileId    String     @map("input_file_id")
+  outputFileId   String?    @map("output_file_id")
+  params         Json       @default("{}")
+  pointsConsumed Int        @map("points_consumed")
+  pointsRefunded Boolean    @default(false) @map("points_refunded")
+  errorMessage   String?    @map("error_message")
+  progress       Int        @default(0)
+  queueJobId     String?    @map("queue_job_id")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  startedAt      DateTime?  @map("started_at")
+  completedAt    DateTime?  @map("completed_at")
+
+  // 关联关系
+  user       User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tool       Tool  @relation(fields: [toolId], references: [id])
+  inputFile  File  @relation("InputFile", fields: [inputFileId], references: [id])
+  outputFile File? @relation("OutputFile", fields: [outputFileId], references: [id])
+
+  @@index([userId, status, createdAt])
+  @@index([status, createdAt])
+  @@map("tasks")
+}
+
+// ============ 积分流水表 ============
+model PointsTransaction {
+  id             String                @id @default(uuid())
+  userId         String                @map("user_id")
+  type           PointsTransactionType
+  amount         Int                   // 正数=获得，负数=消耗
+  balanceAfter   Int                   @map("balance_after")
+  description    String
+  relatedTaskId  String?               @map("related_task_id")
+  createdAt      DateTime              @default(now()) @map("created_at")
+
+  // 关联关系
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("points_transactions")
+}
+
+// ============ 积分套餐表 ============
+model PointsPackage {
+  id          String   @id @default(uuid())
+  name        String
+  points      Int
+  price       Int      // 价格（分）
+  enabled     Boolean  @default(true)
+  description String?
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("points_packages")
+}
+
+// ============ VIP套餐表 ============
+model VipPackage {
+  id            String   @id @default(uuid())
+  type          VipType
+  name          String
+  price         Int      // 价格（分）
+  durationDays  Int      @map("duration_days")
+  monthlyPoints Int      @map("monthly_points")
+  discount      Float    @default(1.0)
+  enabled       Boolean  @default(true)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("vip_packages")
+}
+
+// ============ 订单表 ============
+model Order {
+  id            String         @id @default(uuid())
+  userId        String         @map("user_id")
+  orderNo       String         @unique @map("order_no")
+  type          OrderType
+  amount        Int            // 支付金额（分）
+  status        OrderStatus    @default(PENDING)
+  paymentMethod PaymentMethod? @map("payment_method")
+  paymentNo     String?        @map("payment_no")
+  packageId     String?        @map("package_id")
+  paidAt        DateTime?      @map("paid_at")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  // 关联关系
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([orderNo])
+  @@map("orders")
+}

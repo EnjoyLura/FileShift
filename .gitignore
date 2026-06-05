@@ -42,4 +42,10 @@ coverage/
 *.tmp
 tmp/
 temp/
+
+# Vercel
 .vercel
+.vercel-tmp
+
+# TypeScript build info
+*.tsbuildinfo

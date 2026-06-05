@@ -1,21 +1,25 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { ErrorCodes, ALL_TOOLS, type ApiResponse, type ToolCategory } from '@fileshift/shared';
+import { testConnection } from '../config/database.js';
 
 const router = Router();
 
-// 健康检查
-router.get('/health', (_req: Request, res: Response) => {
+// 健康检查（含数据库连接检测）
+router.get('/health', async (_req: Request, res: Response) => {
+  const dbConnected = await testConnection();
+
   const response: ApiResponse = {
     code: ErrorCodes.SUCCESS,
-    message: 'ok',
+    message: dbConnected ? 'ok' : 'database unavailable',
     data: {
-      status: 'healthy',
+      status: dbConnected ? 'healthy' : 'degraded',
       timestamp: new Date().toISOString(),
       version: '0.1.0',
+      database: dbConnected ? 'connected' : 'disconnected',
     },
   };
-  res.json(response);
+  res.status(dbConnected ? 200 : 503).json(response);
 });
 
 // 获取工具列表
