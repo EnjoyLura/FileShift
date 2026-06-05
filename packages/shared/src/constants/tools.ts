@@ -104,6 +104,28 @@ export const DOCUMENT_TOOLS: ToolConfig[] = [
     inputFormats: ['pdf'],
     outputFormats: ['pdf'],
   },
+  {
+    id: 'pdf-to-ppt',
+    name: 'PDF 转 PPT',
+    description: '将 PDF 文件转换为 PowerPoint 演示文稿',
+    category: ToolCategory.DOCUMENT,
+    pointsCost: 5,
+    vipDiscount: 0.8,
+    maxFileSize: 50 * 1024 * 1024,
+    inputFormats: ['pdf'],
+    outputFormats: ['pptx'],
+  },
+  {
+    id: 'ppt-to-pdf',
+    name: 'PPT 转 PDF',
+    description: '将 PowerPoint 演示文稿转换为 PDF 格式',
+    category: ToolCategory.DOCUMENT,
+    pointsCost: 3,
+    vipDiscount: 0.8,
+    maxFileSize: 50 * 1024 * 1024,
+    inputFormats: ['pptx', 'ppt'],
+    outputFormats: ['pdf'],
+  },
 ];
 
 // 图片类工具

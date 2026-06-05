@@ -1,0 +1,77 @@
+# FileShift 生产环境 Dockerfile
+# 多阶段构建：先编译 TypeScript，再打包精简运行镜像
+
+# ============ 阶段1：构建 ============
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# 安装 pnpm
+RUN npm install -g pnpm
+
+# 复制工作区配置
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY packages/shared/package.json packages/shared/
+COPY packages/server/package.json packages/server/
+COPY packages/client/package.json packages/client/
+
+# 安装依赖
+RUN pnpm install --frozen-lockfile
+
+# 复制源码
+COPY packages/shared packages/shared
+COPY packages/server packages/server
+COPY packages/client packages/client
+
+# 编译 shared
+RUN pnpm --filter @fileshift/shared build
+
+# 编译 server
+RUN pnpm --filter @fileshift/server build
+
+# 编译 client
+RUN pnpm --filter @fileshift/client build
+
+# ============ 阶段2：运行 ============
+FROM node:20-slim AS runtime
+
+# 安装 LibreOffice + 常用字体
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libreoffice-core \
+    libreoffice-writer \
+    libreoffice-calc \
+    libreoffice-impress \
+    libreoffice-common \
+    fonts-wqy-zenhei \
+    fonts-wqy-microhei \
+    fonts-noto-cjk \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# 复制编译产物
+COPY --from=builder /app/packages/server/dist ./dist
+COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
+COPY --from=builder /app/packages/server/prisma ./prisma
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages/server/node_modules ./packages/server/node_modules
+
+# 创建数据目录
+RUN mkdir -p /data/uploads /data/outputs /data/temp
+
+# 设置环境变量
+ENV NODE_ENV=production
+ENV LIBREOFFICE_PATH=/usr/bin/soffice
+ENV UPLOAD_DIR=/data/uploads
+ENV OUTPUT_DIR=/data/outputs
+ENV TEMP_DIR=/data/temp
+
+EXPOSE 3000
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD node -e "fetch('http://localhost:3000/api/health').then(r => r.json()).then(d => { if (d.code !== 0) process.exit(1) }).catch(() => process.exit(1))"
+
+# 启动命令
+CMD ["node", "dist/server.js"]
