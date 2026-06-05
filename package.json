@@ -1,0 +1,36 @@
+{
+  "name": "fileshift",
+  "version": "0.1.0",
+  "private": true,
+  "description": "FileShift - 在线文件格式转换与处理工具站",
+  "scripts": {
+    "dev": "pnpm --parallel -r dev",
+    "dev:server": "pnpm --filter @fileshift/server dev",
+    "dev:client": "pnpm --filter @fileshift/client dev",
+    "build": "pnpm -r build",
+    "build:server": "pnpm --filter @fileshift/server build",
+    "build:client": "pnpm --filter @fileshift/client build",
+    "lint": "eslint . --fix",
+    "lint:check": "eslint .",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\"",
+    "test": "pnpm -r test",
+    "clean": "pnpm -r exec rm -rf dist node_modules"
+  },
+  "keywords": ["file-conversion", "pdf", "image", "video", "tools"],
+  "author": "EnjoyLura",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.16.0",
+    "@eslint/js": "^9.16.0",
+    "typescript-eslint": "^8.17.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "prettier": "^3.4.0",
+    "typescript": "^5.7.0"
+  }
+}
