@@ -1,0 +1,9 @@
+{
+  "buildCommand": "npx pnpm --filter @fileshift/shared build && npx pnpm --filter @fileshift/client build",
+  "outputDirectory": "packages/client/dist",
+  "installCommand": "npx pnpm install --frozen-lockfile",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/packages/client/dist/index.html" }
+  ]
+}
