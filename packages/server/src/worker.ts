@@ -1,11 +1,12 @@
-// Worker 进程入口（Step 4 中完善）
+// Worker 进程入口
+// 独立于 API 服务器运行，专门处理异步任务
+import 'dotenv/config';
+import { startAllWorkers } from './workers/index.js';
 import { logger } from './utils/logger.js';
 
-logger.info('FileShift Worker process started');
-logger.info('Worker queues will be registered in Step 4');
+logger.info('FileShift Worker process starting...');
 
-// 保持进程运行
-process.on('SIGINT', () => {
-  logger.info('Worker process shutting down...');
-  process.exit(0);
-});
+// 启动所有 Worker
+startAllWorkers();
+
+logger.info('Worker process is ready and listening for tasks');

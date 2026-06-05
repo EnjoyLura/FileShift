@@ -5,6 +5,7 @@ import { testConnection } from '../config/database.js';
 import { testRedisConnection } from '../config/redis.js';
 import { authRouter } from './auth.routes.js';
 import { fileRouter } from './file.routes.js';
+import { taskRouter } from './task.routes.js';
 
 const router = Router();
 
@@ -74,5 +75,10 @@ router.use('/v1/user', authRouter);
 
 // 文件相关：/api/v1/files/*
 router.use('/v1/files', fileRouter);
+
+// ========== 任务路由 ==========
+
+// 任务相关：/api/v1/tasks/*
+router.use('/v1/tasks', taskRouter);
 
 export { router as apiRouter };
