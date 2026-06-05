@@ -6,6 +6,7 @@ import { testRedisConnection } from '../config/redis.js';
 import { authRouter } from './auth.routes.js';
 import { fileRouter } from './file.routes.js';
 import { taskRouter } from './task.routes.js';
+import { pointsRouter } from './points.routes.js';
 
 const router = Router();
 
@@ -80,5 +81,10 @@ router.use('/v1/files', fileRouter);
 
 // 任务相关：/api/v1/tasks/*
 router.use('/v1/tasks', taskRouter);
+
+// ========== 积分路由 ==========
+
+// 积分相关：/api/v1/points/*
+router.use('/v1/points', pointsRouter);
 
 export { router as apiRouter };
