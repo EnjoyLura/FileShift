@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Docker volumes
+data/
+
+# Prisma
+packages/server/prisma/*.db
+packages/server/prisma/*.db-journal
+
+# Coverage
+coverage/
+
+# Temp files
+*.tmp
+tmp/
+temp/
