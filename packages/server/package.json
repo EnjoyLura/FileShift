@@ -30,7 +30,10 @@
     "jsonwebtoken": "^9.0.2",
     "bcryptjs": "^2.4.3",
     "ioredis": "^5.4.1",
-    "nanoid": "^5.0.9"
+    "nanoid": "^5.0.9",
+    "multer": "^1.4.5-lts.2",
+    "mime-types": "^2.1.35",
+    "node-cron": "^3.0.3"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
@@ -38,6 +41,9 @@
     "@types/node": "^22.10.0",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/bcryptjs": "^2.4.6",
+    "@types/multer": "^1.4.12",
+    "@types/mime-types": "^2.1.4",
+    "@types/node-cron": "^3.0.11",
     "prisma": "^5.22.0",
     "typescript": "^5.7.0",
     "tsx": "^4.19.0",

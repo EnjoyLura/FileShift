@@ -4,6 +4,7 @@ import { ErrorCodes, ALL_TOOLS, type ApiResponse, type ToolCategory } from '@fil
 import { testConnection } from '../config/database.js';
 import { testRedisConnection } from '../config/redis.js';
 import { authRouter } from './auth.routes.js';
+import { fileRouter } from './file.routes.js';
 
 const router = Router();
 
@@ -66,7 +67,12 @@ router.get('/v1/tools', (req: Request, res: Response) => {
 // 认证相关：/api/v1/auth/*
 router.use('/v1/auth', authRouter);
 
-// 用户相关（复用 authRouter 中的认证路由）：/api/v1/user/*
+// 用户相关：/api/v1/user/*
 router.use('/v1/user', authRouter);
+
+// ========== 文件路由 ==========
+
+// 文件相关：/api/v1/files/*
+router.use('/v1/files', fileRouter);
 
 export { router as apiRouter };
