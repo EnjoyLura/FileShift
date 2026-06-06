@@ -8,6 +8,7 @@ import { AuthGuard, GuestGuard } from '@/components/AuthGuard';
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const LoginPage = lazy(() => import('@/pages/LoginPage'));
 const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
+const ToolDetailPage = lazy(() => import('@/pages/ToolDetailPage'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
 const PointsPage = lazy(() => import('@/pages/PointsPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
@@ -42,6 +43,7 @@ function App() {
           {/* 公开页面 */}
           <Route index element={<HomePage />} />
           <Route path="tools" element={<ToolsPage />} />
+          <Route path="tools/:id" element={<ToolDetailPage />} />
 
           {/* 仅未登录可访问 */}
           <Route
