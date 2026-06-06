@@ -231,8 +231,17 @@ export function MainLayout() {
 
       {/* 主内容区 */}
       <Layout style={{ marginLeft: collapsed ? 80 : 220, transition: 'margin-left 0.2s' }}>
-        <Header className="flex items-center bg-white px-6 shadow-sm h-14 leading-[56px]">
+        <Header className="flex items-center justify-between bg-white px-6 shadow-sm h-14 leading-[56px]">
           <Text type="secondary">文件格式，一键切换</Text>
+          {!isLoggedIn && (
+            <Button
+              type="primary"
+              icon={<LoginOutlined />}
+              onClick={() => navigate('/login')}
+            >
+              登录 / 注册
+            </Button>
+          )}
         </Header>
         <Content className="p-6 bg-gray-50 min-h-[calc(100vh-56px)]">
           <Outlet />

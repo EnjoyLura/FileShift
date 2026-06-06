@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Typography, Input, Tabs, Row, Col, Spin, Empty } from 'antd';
 import { SearchOutlined, ThunderboltOutlined, ExperimentOutlined } from '@ant-design/icons';
 import type { ToolConfig } from '@fileshift/shared';
-import { ToolCategory } from '@fileshift/shared';
+import { ToolCategory, ALL_TOOLS } from '@fileshift/shared';
 import { get } from '@/services/api';
 import ToolCard from '@/components/ToolCard';
 
@@ -64,8 +64,11 @@ export default function HomePage() {
           setTools(filtered);
         }
       } catch {
-        // 请求失败时使用空列表（开发环境 Mock 降级）
-        if (!cancelled) setTools([]);
+        // 请求失败时使用静态工具数据（无后端降级）
+        if (!cancelled) {
+          const staticTools = ALL_TOOLS.filter((t) => t.id !== 'mock-tool');
+          setTools(staticTools);
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
