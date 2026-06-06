@@ -2,11 +2,11 @@ import { create } from 'zustand';
 
 interface UserInfo {
   id: string;
-  email: string;
-  phone: string;
+  email?: string;
+  phone?: string;
   nickname: string;
-  avatar: string;
-  vipType: string | null;
+  avatar?: string | null;
+  vipType?: string | null;
   points: number;
 }
 
