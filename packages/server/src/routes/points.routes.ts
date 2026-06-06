@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import type { Request, Response } from 'express';
+import type { Request, Response, Router as RouterType } from 'express';
 import { z } from 'zod';
-import { ErrorCodes, type ApiResponse } from '@fileshift/shared';
+import { ErrorCodes, PointsTransactionType, type ApiResponse } from '@fileshift/shared';
 import { authMiddleware } from '../middleware/auth.js';
 import { AppError } from '../middleware/errorHandler.js';
 import {
@@ -13,17 +13,14 @@ import {
   getInviteInfo,
 } from '../services/points.service.js';
 
-const router = Router();
-
-// 所有积分操作需要登录
-router.use(authMiddleware);
+const router: RouterType = Router();
 
 // ========== Zod Schemas ==========
 
 const paginationSchema = z.object({
   page: z.coerce.number().min(1).default(1),
   pageSize: z.coerce.number().min(1).max(100).default(20),
-  type: z.string().optional(),
+  type: z.nativeEnum(PointsTransactionType).optional(),
 });
 
 // ========== 积分余额 ==========
@@ -31,7 +28,7 @@ const paginationSchema = z.object({
 /**
  * GET /api/v1/points/balance - 查询积分余额
  */
-router.get('/balance', async (req: Request, res: Response) => {
+router.get('/balance', authMiddleware, async (req: Request, res: Response) => {
   try {
     const result = await getPointsBalance(req.user!.userId);
 
@@ -60,7 +57,7 @@ router.get('/balance', async (req: Request, res: Response) => {
 /**
  * GET /api/v1/points/transactions - 查询积分流水
  */
-router.get('/transactions', async (req: Request, res: Response) => {
+router.get('/transactions', authMiddleware, async (req: Request, res: Response) => {
   const parsed = paginationSchema.safeParse(req.query);
   if (!parsed.success) {
     const response: ApiResponse<null> = {
@@ -161,7 +158,7 @@ router.get('/vip-packages', async (_req: Request, res: Response) => {
 /**
  * POST /api/v1/points/sign-in - 每日签到
  */
-router.post('/sign-in', async (req: Request, res: Response) => {
+router.post('/sign-in', authMiddleware, async (req: Request, res: Response) => {
   try {
     const result = await signIn(req.user!.userId);
 
@@ -193,7 +190,7 @@ router.post('/sign-in', async (req: Request, res: Response) => {
 /**
  * GET /api/v1/points/invite - 获取邀请信息
  */
-router.get('/invite', async (req: Request, res: Response) => {
+router.get('/invite', authMiddleware, async (req: Request, res: Response) => {
   try {
     const result = await getInviteInfo(req.user!.userId);
 

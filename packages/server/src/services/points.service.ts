@@ -28,9 +28,10 @@ export async function getPointsBalance(userId: string) {
     throw new AppError(ErrorCodes.NOT_FOUND, '用户不存在', 404);
   }
 
-  // 获取 VIP 折扣
+  // 获取 VIP 折扣（需检查 VIP 是否过期）
   let vipDiscount = 1.0;
-  if (user.vipType) {
+  const now = new Date();
+  if (user.vipType && user.vipExpiresAt && user.vipExpiresAt > now) {
     const vipPackage = await prisma.vipPackage.findFirst({
       where: { type: user.vipType },
       select: { discount: true },
@@ -129,7 +130,7 @@ export async function getVipPackages() {
     durationDays: pkg.durationDays,
     monthlyPoints: pkg.monthlyPoints,
     discount: pkg.discount,
-    discountDisplay: `${pkg.discount * 10}折`,
+    discountDisplay: `${(pkg.discount * 10).toFixed(1).replace(/\.0$/, '')}折`,
   }));
 }
 
@@ -145,56 +146,56 @@ export async function getVipPackages() {
  * - 断签后连续天数重置为 1
  */
 export async function signIn(userId: string) {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      points: true,
-      lastSignInAt: true,
-      consecutiveSignInDays: true,
-    },
-  });
-
-  if (!user) {
-    throw new AppError(ErrorCodes.NOT_FOUND, '用户不存在', 404);
-  }
-
-  // 检查今日是否已签到
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-  if (user.lastSignInAt && user.lastSignInAt >= todayStart) {
-    throw new AppError(ErrorCodes.PARAM_ERROR, '今日已签到，明天再来吧', 400);
-  }
-
-  // 计算连续签到天数
-  let consecutiveDays = 1;
-  if (user.lastSignInAt) {
-    const lastSignInDate = new Date(user.lastSignInAt);
-    const yesterday = new Date(todayStart);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    // 如果上次签到是昨天，连续天数 +1
-    if (
-      lastSignInDate.getFullYear() === yesterday.getFullYear() &&
-      lastSignInDate.getMonth() === yesterday.getMonth() &&
-      lastSignInDate.getDate() === yesterday.getDate()
-    ) {
-      consecutiveDays = user.consecutiveSignInDays + 1;
-    }
-  }
-
-  // 计算奖励积分
-  let earnedPoints = SIGN_IN_BASE_POINTS;
-  let bonusEarned = 0;
-
-  // 连续签到 7 天额外奖励
-  if (consecutiveDays > 0 && consecutiveDays % SIGN_IN_BONUS_DAYS === 0) {
-    bonusEarned = SIGN_IN_BONUS_POINTS;
-    earnedPoints += bonusEarned;
-  }
-
-  // 事务：更新用户信息 + 写入流水
+  // 事务内完成所有读写，防止并发重复签到
   const result = await prisma.$transaction(async (tx) => {
+    const user = await tx.user.findUnique({
+      where: { id: userId },
+      select: {
+        points: true,
+        lastSignInAt: true,
+        consecutiveSignInDays: true,
+      },
+    });
+
+    if (!user) {
+      throw new AppError(ErrorCodes.NOT_FOUND, '用户不存在', 404);
+    }
+
+    // 检查今日是否已签到（事务内原子检查）
+    if (user.lastSignInAt && user.lastSignInAt >= todayStart) {
+      throw new AppError(ErrorCodes.PARAM_ERROR, '今日已签到，明天再来吧', 400);
+    }
+
+    // 计算连续签到天数
+    let consecutiveDays = 1;
+    if (user.lastSignInAt) {
+      const lastSignInDate = new Date(user.lastSignInAt);
+      const yesterday = new Date(todayStart);
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      // 如果上次签到是昨天，连续天数 +1
+      if (
+        lastSignInDate.getFullYear() === yesterday.getFullYear() &&
+        lastSignInDate.getMonth() === yesterday.getMonth() &&
+        lastSignInDate.getDate() === yesterday.getDate()
+      ) {
+        consecutiveDays = user.consecutiveSignInDays + 1;
+      }
+    }
+
+    // 计算奖励积分
+    let earnedPoints = SIGN_IN_BASE_POINTS;
+    let bonusEarned = 0;
+
+    // 连续签到 7 天额外奖励
+    if (consecutiveDays > 0 && consecutiveDays % SIGN_IN_BONUS_DAYS === 0) {
+      bonusEarned = SIGN_IN_BONUS_POINTS;
+      earnedPoints += bonusEarned;
+    }
+
     // 更新用户签到信息
     const updatedUser = await tx.user.update({
       where: { id: userId },
@@ -253,7 +254,29 @@ export async function deductPoints(
   description: string,
   relatedTaskId?: string
 ): Promise<{ balanceAfter: number }> {
-  // 使用 update + increment 原子操作
+  if (amount <= 0) {
+    throw new AppError(ErrorCodes.PARAM_ERROR, '扣除金额必须大于 0', 400);
+  }
+
+  // 校验余额是否充足
+  const current = await tx.user.findUnique({
+    where: { id: userId },
+    select: { points: true },
+  });
+
+  if (!current) {
+    throw new AppError(ErrorCodes.NOT_FOUND, '用户不存在', 404);
+  }
+
+  if (current.points < amount) {
+    throw new AppError(
+      ErrorCodes.INSUFFICIENT_POINTS,
+      `积分不足，需要 ${amount} 积分，当前余额 ${current.points}`,
+      422
+    );
+  }
+
+  // 原子扣减
   const user = await tx.user.update({
     where: { id: userId },
     data: { points: { decrement: amount } },
@@ -286,6 +309,10 @@ export async function addPoints(
   description: string,
   relatedTaskId?: string
 ): Promise<{ balanceAfter: number }> {
+  if (amount <= 0) {
+    throw new AppError(ErrorCodes.PARAM_ERROR, '增加金额必须大于 0', 400);
+  }
+
   const user = await tx.user.update({
     where: { id: userId },
     data: { points: { increment: amount } },
