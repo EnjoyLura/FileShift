@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Layout, Menu, Button, Badge, Dropdown, Avatar, Typography } from 'antd';
+import { Layout, Menu, Button, Dropdown, Avatar, Typography } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   HomeOutlined,
@@ -15,6 +15,7 @@ import {
   LoginOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from '@/stores/useAuthStore';
+import PointsBadge from '@/components/PointsBadge';
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -97,9 +98,7 @@ export function MainLayout() {
             FileShift
           </Text>
           {isLoggedIn ? (
-            <Badge count={user?.points ?? 0} overflowCount={9999} showZero color="blue" size="small">
-              <GiftOutlined className="text-lg text-gray-500" />
-            </Badge>
+            <PointsBadge />
           ) : (
             <Button type="primary" size="small" icon={<LoginOutlined />} onClick={() => navigate('/login')}>
               登录
@@ -190,7 +189,7 @@ export function MainLayout() {
                   {!collapsed && (
                     <div className="flex-1 min-w-0">
                       <div className="text-sm truncate">{user.nickname || '用户'}</div>
-                      <Badge count={user.points} overflowCount={9999} color="blue" className="text-xs" />
+                      <PointsBadge size={14} clickable={false} />
                     </div>
                   )}
                 </div>
