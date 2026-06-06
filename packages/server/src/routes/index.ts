@@ -87,4 +87,15 @@ router.use('/v1/tasks', taskRouter);
 // 积分相关：/api/v1/points/*
 router.use('/v1/points', pointsRouter);
 
+// ========== 404 处理（API 路由末尾） ==========
+
+router.use((_req: Request, res: Response) => {
+  const response: ApiResponse<null> = {
+    code: ErrorCodes.NOT_FOUND,
+    message: '接口不存在',
+    data: null,
+  };
+  res.status(404).json(response);
+});
+
 export { router as apiRouter };
