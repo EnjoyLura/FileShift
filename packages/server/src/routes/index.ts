@@ -5,6 +5,7 @@ import { testConnection } from '../config/database.js';
 import { testRedisConnection } from '../config/redis.js';
 import { authRouter } from './auth.routes.js';
 import { userRouter } from './user.routes.js';
+import { wechatRouter } from './wechat.routes.js';
 import { fileRouter } from './file.routes.js';
 import { taskRouter } from './task.routes.js';
 import { pointsRouter } from './points.routes.js';
@@ -73,7 +74,10 @@ router.use('/v1/auth', authRouter);
 // 用户相关：/api/v1/user/*
 router.use('/v1/user', userRouter);
 
-// ========== 文件路由 ==========
+// 微信认证：/api/v1/auth/wechat/*
+router.use('/v1/auth/wechat', wechatRouter);
+
+// 文件路由
 
 // 文件相关：/api/v1/files/*
 router.use('/v1/files', fileRouter);

@@ -68,3 +68,21 @@ export interface AuthResponse {
   tokens: AuthTokens;
   user: Pick<User, 'id' | 'nickname' | 'avatar' | 'points' | 'vipType'>;
 }
+
+// 微信登录相关类型
+
+export interface WechatUrlResponse {
+  url: string;
+  state: string;
+  pollId?: string; // PC端轮询ID
+}
+
+export interface WechatPollResponse {
+  status: 'pending' | 'completed';
+  tokens?: AuthTokens;
+  user?: Pick<User, 'id' | 'nickname' | 'avatar' | 'points' | 'vipType'>;
+}
+
+export interface WechatBindRequest {
+  code: string;
+}

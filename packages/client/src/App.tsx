@@ -12,6 +12,7 @@ const ToolDetailPage = lazy(() => import('@/pages/ToolDetailPage'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
 const PointsPage = lazy(() => import('@/pages/PointsPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
+const WechatCallback = lazy(() => import('@/pages/WechatCallback'));
 
 /** 页面加载中占位 */
 function PageLoading() {
@@ -79,6 +80,9 @@ function App() {
               </AuthGuard>
             }
           />
+
+          {/* 微信 OAuth 回调（公开） */}
+          <Route path="auth/wechat/callback" element={<WechatCallback />} />
 
           {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />

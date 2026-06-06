@@ -7,11 +7,13 @@ import {
   LockOutlined,
   UserOutlined,
   GiftOutlined,
+  WechatOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCountdown } from '@/hooks/useCountdown';
 import { post } from '@/services/api';
 import type { AuthResponse } from '@fileshift/shared';
+import WechatLogin from '@/components/WechatLogin';
 
 const { Title, Text, Link } = Typography;
 
@@ -61,8 +63,8 @@ export default function LoginPage() {
 
   // 顶层 Tab：登录 / 注册
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
-  // 登录子 Tab：邮箱 / 手机号
-  const [loginMode, setLoginMode] = useState<'email' | 'phone'>('email');
+  // 登录子 Tab：邮箱 / 手机号 / 微信
+  const [loginMode, setLoginMode] = useState<'email' | 'phone' | 'wechat'>('email');
 
   // 加载状态
   const [loading, setLoading] = useState(false);
@@ -381,7 +383,7 @@ export default function LoginPage() {
                   {/* 登录方式切换 */}
                   <Tabs
                     activeKey={loginMode}
-                    onChange={(key) => setLoginMode(key as 'email' | 'phone')}
+                    onChange={(key) => setLoginMode(key as 'email' | 'phone' | 'wechat')}
                     centered
                     size="small"
                     items={[
@@ -473,6 +475,16 @@ export default function LoginPage() {
                             </Form>
                           </div>
                         ),
+                      },
+                      {
+                        key: 'wechat',
+                        label: (
+                          <span>
+                            <WechatOutlined className="mr-1" />
+                            微信登录
+                          </span>
+                        ),
+                        children: <WechatLogin redirectTo={redirectTo} />,
                       },
                     ]}
                   />
