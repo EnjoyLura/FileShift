@@ -32,6 +32,9 @@ importers:
 
   packages/client:
     dependencies:
+      '@ant-design/icons':
+        specifier: ^5.5.0
+        version: 5.6.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@fileshift/shared':
         specifier: workspace:*
         version: link:../shared
