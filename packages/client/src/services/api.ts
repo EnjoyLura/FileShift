@@ -1,11 +1,19 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import type { ApiResponse } from '@fileshift/shared';
 
+// 通过 VITE_API_BASE_URL 环境变量配置远程后端地址
+// 本地开发: 不设置，使用 Vite proxy (/api → localhost:3000)
+// 生产部署: 设置为 tunnel URL，如 https://xxx.loca.lt/api
+const API_BASE = import.meta.env.VITE_API_BASE_URL as string | undefined;
+const isTunnel = !!API_BASE;
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE || '/api',
   timeout: 30_000,
   headers: {
     'Content-Type': 'application/json',
+    // localtunnel 需要此 Header 跳过验证页
+    ...(isTunnel ? { 'Bypass-Tunnel-Reminder': 'true' } : {}),
   },
 });
 
@@ -38,7 +46,7 @@ async function refreshAccessToken(): Promise<string> {
   }
 
   const res = await axios.post<ApiResponse<{ accessToken: string; refreshToken: string }>>(
-    '/api/v1/auth/token/refresh',
+    `${API_BASE || '/api'}/v1/auth/token/refresh`,
     { refreshToken }
   );
 
