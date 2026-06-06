@@ -43,7 +43,13 @@ function App() {
           {/* 公开页面 */}
           <Route index element={<HomePage />} />
           <Route path="tools" element={<ToolsPage />} />
-          <Route path="tools/:id" element={<ToolDetailPage />} />
+          <Route path="tools/:id"
+            element={
+              <AuthGuard>
+                <ToolDetailPage />
+              </AuthGuard>
+            }
+          />
 
           {/* 仅未登录可访问 */}
           <Route
