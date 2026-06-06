@@ -3,7 +3,5 @@
   "outputDirectory": "packages/client/dist",
   "installCommand": "npx pnpm install --frozen-lockfile",
   "framework": "vite",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/packages/client/dist/index.html" }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/packages/client/dist/index.html" }]
 }

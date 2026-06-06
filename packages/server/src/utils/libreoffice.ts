@@ -91,9 +91,6 @@ export async function convertWithLibreOffice(
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  const inputDir = path.dirname(path.resolve(inputFilePath));
-  const inputFileName = path.basename(inputFilePath);
-
   logger.info(
     {
       input: inputFilePath,
@@ -123,7 +120,7 @@ export async function convertWithLibreOffice(
       path.resolve(inputFilePath),
     ];
 
-    const { stdout, stderr } = await execFileAsync(LIBREOFFICE_PATH, args, {
+    const { stdout: _stdout, stderr } = await execFileAsync(LIBREOFFICE_PATH, args, {
       timeout: 120000, // 2分钟超时
       maxBuffer: 10 * 1024 * 1024,
       // 使用 HOME 环境变量避免配置文件冲突
@@ -155,7 +152,10 @@ export async function convertWithLibreOffice(
 
       if (files.length > 0) {
         const actualPath = path.join(outputDir, files[0]);
-        logger.info({ elapsed: `${elapsed}ms`, outputPath: actualPath }, 'LibreOffice conversion completed');
+        logger.info(
+          { elapsed: `${elapsed}ms`, outputPath: actualPath },
+          'LibreOffice conversion completed'
+        );
         return actualPath;
       }
 
@@ -178,9 +178,7 @@ export async function convertWithLibreOffice(
       throw new Error('文件转换超时（超过120秒），请尝试转换较小的文件');
     }
 
-    throw new Error(
-      `LibreOffice 转换失败: ${error instanceof Error ? error.message : '未知错误'}`
-    );
+    throw new Error(`LibreOffice 转换失败: ${error instanceof Error ? error.message : '未知错误'}`);
   }
 }
 

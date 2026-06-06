@@ -43,7 +43,8 @@ function App() {
           {/* 公开页面 */}
           <Route index element={<HomePage />} />
           <Route path="tools" element={<ToolsPage />} />
-          <Route path="tools/:id"
+          <Route
+            path="tools/:id"
             element={
               <AuthGuard>
                 <ToolDetailPage />

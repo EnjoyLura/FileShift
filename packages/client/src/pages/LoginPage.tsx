@@ -1,17 +1,13 @@
 import { useState, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Form, Input, Button, Tabs, Typography, message, Progress, Card, Space } from 'antd';
 import {
-  Form,
-  Input,
-  Button,
-  Tabs,
-  Typography,
-  message,
-  Progress,
-  Card,
-  Space,
-} from 'antd';
-import { MailOutlined, MobileOutlined, LockOutlined, UserOutlined, GiftOutlined } from '@ant-design/icons';
+  MailOutlined,
+  MobileOutlined,
+  LockOutlined,
+  UserOutlined,
+  GiftOutlined,
+} from '@ant-design/icons';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCountdown } from '@/hooks/useCountdown';
 import { post } from '@/services/api';
@@ -22,8 +18,8 @@ const { Title, Text, Link } = Typography;
 // ========== 密码强度评估 ==========
 
 interface StrengthResult {
-  score: number;       // 0-4
-  percent: number;     // 0-100
+  score: number; // 0-4
+  percent: number; // 0-100
   status: 'exception' | 'active' | 'normal' | 'success';
   label: string;
 }
@@ -124,7 +120,9 @@ export default function LoginPage() {
 
       setSmsLoading(true);
       try {
-        const res = await post<{ message: string; devCode?: string }>('/v1/auth/sms/send', { phone });
+        const res = await post<{ message: string; devCode?: string }>('/v1/auth/sms/send', {
+          phone,
+        });
         if (res.code === 0) {
           startCountdown();
           message.success('验证码已发送');
@@ -229,7 +227,10 @@ export default function LoginPage() {
           { min: 8, message: '密码至少 8 位' },
         ]}
       >
-        <Input.Password prefix={<LockOutlined className="text-gray-400" />} placeholder="请输入密码" />
+        <Input.Password
+          prefix={<LockOutlined className="text-gray-400" />}
+          placeholder="请输入密码"
+        />
       </Form.Item>
 
       <Form.Item>
@@ -252,9 +253,7 @@ export default function LoginPage() {
       onFinish={handleRegister}
       onValuesChange={(changed) => {
         if ('password' in changed) {
-          setPasswordStrength(
-            changed.password ? evaluatePasswordStrength(changed.password) : null
-          );
+          setPasswordStrength(changed.password ? evaluatePasswordStrength(changed.password) : null);
         }
       }}
       autoComplete="off"
@@ -280,7 +279,10 @@ export default function LoginPage() {
           },
         ]}
       >
-        <Input.Password prefix={<LockOutlined className="text-gray-400" />} placeholder="请设置密码（8位以上，含大小写字母和数字）" />
+        <Input.Password
+          prefix={<LockOutlined className="text-gray-400" />}
+          placeholder="请设置密码（8位以上，含大小写字母和数字）"
+        />
       </Form.Item>
 
       {/* 密码强度指示 */}
@@ -295,8 +297,8 @@ export default function LoginPage() {
               passwordStrength.score <= 1
                 ? '#ff4d4f'
                 : passwordStrength.score <= 2
-                ? '#faad14'
-                : '#52c41a'
+                  ? '#faad14'
+                  : '#52c41a'
             }
           />
           <Text type="secondary" className="text-xs">
@@ -321,7 +323,10 @@ export default function LoginPage() {
           }),
         ]}
       >
-        <Input.Password prefix={<LockOutlined className="text-gray-400" />} placeholder="请再次输入密码" />
+        <Input.Password
+          prefix={<LockOutlined className="text-gray-400" />}
+          placeholder="请再次输入密码"
+        />
       </Form.Item>
 
       <Form.Item name="inviteCode">
@@ -340,17 +345,16 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-8">
-      <Card
-        className="w-full max-w-md shadow-lg"
-        styles={{ body: { padding: '32px 28px' } }}
-      >
+      <Card className="w-full max-w-md shadow-lg" styles={{ body: { padding: '32px 28px' } }}>
         {/* 标题 */}
         <div className="text-center mb-6">
           <Title level={3} className="!mb-1">
             {activeTab === 'login' ? '欢迎回来' : '创建账号'}
           </Title>
           <Text type="secondary">
-            {activeTab === 'login' ? '登录你的 FileShift 账号' : '注册 FileShift 账号，开启文件转换之旅'}
+            {activeTab === 'login'
+              ? '登录你的 FileShift 账号'
+              : '注册 FileShift 账号，开启文件转换之旅'}
           </Text>
         </div>
 
@@ -442,8 +446,9 @@ export default function LoginPage() {
                                     disabled={countdown > 0}
                                     loading={smsLoading}
                                     onClick={() => {
-                                      const phoneInput =
-                                        document.getElementById('phone-input') as HTMLInputElement | null;
+                                      const phoneInput = document.getElementById(
+                                        'phone-input'
+                                      ) as HTMLInputElement | null;
                                       const phone = phoneInput?.value || '';
                                       handleSendSms(phone);
                                     }}

@@ -16,9 +16,7 @@ import {
  *
  * 通过 toolId 自动确定输入输出格式
  */
-export async function libreOfficeConvertProcessor(
-  data: TaskJobData
-): Promise<string> {
+export async function libreOfficeConvertProcessor(data: TaskJobData): Promise<string> {
   const { toolId, inputFilePath, outputDir } = data;
 
   logger.info({ toolId, inputFilePath }, 'LibreOffice convert processor started');
@@ -39,11 +37,7 @@ export async function libreOfficeConvertProcessor(
   }
 
   // 执行转换
-  const outputPath = await convertWithLibreOffice(
-    inputFilePath,
-    outputDir,
-    conversion.target
-  );
+  const outputPath = await convertWithLibreOffice(inputFilePath, outputDir, conversion.target);
 
   logger.info(
     {

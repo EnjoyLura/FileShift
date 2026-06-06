@@ -23,13 +23,7 @@ export default function PointsBadge({ size = 18, clickable = true }: PointsBadge
   if (!isLoggedIn || !user) return null;
 
   const badge = (
-    <Badge
-      count={user.points}
-      overflowCount={9999}
-      showZero
-      color="blue"
-      size="small"
-    >
+    <Badge count={user.points} overflowCount={9999} showZero color="blue" size="small">
       <GiftOutlined style={{ fontSize: size }} className="text-gray-500" />
     </Badge>
   );

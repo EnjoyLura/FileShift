@@ -15,9 +15,17 @@
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\"",
     "test": "pnpm -r test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "clean": "pnpm -r exec rm -rf dist node_modules"
   },
-  "keywords": ["file-conversion", "pdf", "image", "video", "tools"],
+  "keywords": [
+    "file-conversion",
+    "pdf",
+    "image",
+    "video",
+    "tools"
+  ],
   "author": "EnjoyLura",
   "license": "MIT",
   "engines": {
@@ -25,12 +33,14 @@
     "pnpm": ">=9.0.0"
   },
   "devDependencies": {
-    "eslint": "^9.16.0",
     "@eslint/js": "^9.16.0",
-    "typescript-eslint": "^8.17.0",
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^22.19.19",
+    "eslint": "^9.16.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",
     "prettier": "^3.4.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.17.0"
   }
 }

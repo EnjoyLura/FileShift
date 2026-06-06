@@ -60,7 +60,12 @@ const statusConfigMap: Record<string, StatusConfig> = {
  * 根据 TaskStatus 展示不同阶段的图标、进度条、状态文字。
  * 处理完成时显示积分消耗，失败时显示错误详情。
  */
-export default function ProgressBar({ status, progress, errorMessage, pointsConsumed }: ProgressBarProps) {
+export default function ProgressBar({
+  status,
+  progress,
+  errorMessage,
+  pointsConsumed,
+}: ProgressBarProps) {
   if (!status) return null;
 
   const config = statusConfigMap[status] ?? statusConfigMap[TaskStatus.PENDING];

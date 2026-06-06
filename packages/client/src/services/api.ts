@@ -59,7 +59,11 @@ api.interceptors.response.use(
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
     // Token 过期，尝试刷新
-    if (error.response?.status === 401 && error.response?.data?.code === 40102 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      error.response?.data?.code === 40102 &&
+      !originalRequest._retry
+    ) {
       if (isRefreshing) {
         // 已有刷新在进行中，加入等待队列
         return new Promise((resolve, reject) => {
@@ -108,7 +112,10 @@ export default api;
 
 // ========== 常用请求方法封装 ==========
 
-export async function get<T>(url: string, params?: Record<string, unknown>): Promise<ApiResponse<T>> {
+export async function get<T>(
+  url: string,
+  params?: Record<string, unknown>
+): Promise<ApiResponse<T>> {
   const res = await api.get<ApiResponse<T>>(url, { params });
   return res.data;
 }

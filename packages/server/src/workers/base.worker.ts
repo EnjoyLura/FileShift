@@ -32,8 +32,14 @@ export function createWorker(
   const worker = new Worker<TaskJobData>(
     queueName,
     async (job: Job<TaskJobData>) => {
-      const { taskId, toolId, inputFilePath, outputDir, params, pointsConsumed } =
-        job.data;
+      const {
+        taskId,
+        toolId,
+        inputFilePath,
+        outputDir: _outputDir,
+        params: _params,
+        pointsConsumed,
+      } = job.data;
 
       logger.info({ taskId, toolId, jobId: job.id }, 'Processing task');
 
@@ -99,8 +105,7 @@ export function createWorker(
 
         return { outputPath };
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
         logger.error({ taskId, toolId, error: errorMessage }, 'Task failed');
 
@@ -148,10 +153,7 @@ export function createWorker(
   });
 
   worker.on('failed', (job, err) => {
-    logger.error(
-      { jobId: job?.id, queue: queueName, error: err.message },
-      'Job failed'
-    );
+    logger.error({ jobId: job?.id, queue: queueName, error: err.message }, 'Job failed');
   });
 
   return worker;
@@ -160,11 +162,7 @@ export function createWorker(
 /**
  * 退还积分
  */
-async function refundPoints(
-  userId: string,
-  amount: number,
-  taskId: string
-): Promise<void> {
+async function refundPoints(userId: string, amount: number, taskId: string): Promise<void> {
   try {
     await prisma.$transaction(async (tx) => {
       // 增加积分

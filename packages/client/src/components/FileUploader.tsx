@@ -219,8 +219,8 @@ export default function FileUploader({
           disabled
             ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-60'
             : isDragOver
-            ? 'border-primary-400 bg-primary-50 scale-[1.02]'
-            : 'border-gray-300 bg-gray-50/50 hover:border-primary-300 hover:bg-primary-50/30'
+              ? 'border-primary-400 bg-primary-50 scale-[1.02]'
+              : 'border-gray-300 bg-gray-50/50 hover:border-primary-300 hover:bg-primary-50/30'
         }`}
       >
         <CloudUploadOutlined

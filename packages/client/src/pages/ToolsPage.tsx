@@ -66,7 +66,9 @@ export default function ToolsPage() {
     }
 
     fetchTools();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // ========== 筛选 ==========
@@ -96,10 +98,13 @@ export default function ToolsPage() {
 
   // ========== 事件处理 ==========
 
-  const handleTabChange = useCallback((key: string) => {
-    setActiveTab(key as TabKey);
-    setSearchParams(key !== 'all' ? { category: key } : {}, { replace: true });
-  }, [setSearchParams]);
+  const handleTabChange = useCallback(
+    (key: string) => {
+      setActiveTab(key as TabKey);
+      setSearchParams(key !== 'all' ? { category: key } : {}, { replace: true });
+    },
+    [setSearchParams]
+  );
 
   const handleSearch = useCallback((value: string) => {
     setKeyword(value);
@@ -122,9 +127,7 @@ export default function ToolsPage() {
         <Title level={3} className="!mb-1">
           全部工具
         </Title>
-        <span className="text-sm text-gray-400">
-          共 {filteredTools.length} 个工具可用
-        </span>
+        <span className="text-sm text-gray-400">共 {filteredTools.length} 个工具可用</span>
       </div>
 
       {/* 搜索框 */}

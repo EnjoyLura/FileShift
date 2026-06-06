@@ -7,7 +7,7 @@ import fs from 'fs/promises';
  */
 const FILE_SIGNATURES: Record<string, { mime: string; ext: string }> = {
   // 图片
-  'ffd8ff': { mime: 'image/jpeg', ext: '.jpg' },
+  ffd8ff: { mime: 'image/jpeg', ext: '.jpg' },
   '89504e47': { mime: 'image/png', ext: '.png' },
   '47494638': { mime: 'image/gif', ext: '.gif' },
   '52494646': { mime: 'image/webp', ext: '.webp' }, // RIFF header (WebP)
@@ -16,11 +16,11 @@ const FILE_SIGNATURES: Record<string, { mime: string; ext: string }> = {
   // 文档
   '25504446': { mime: 'application/pdf', ext: '.pdf' },
   '504b0304': { mime: 'application/zip', ext: '.zip' }, // ZIP (docx/xlsx/pptx 也是 ZIP)
-  'd0cf11e0': { mime: 'application/msword', ext: '.doc' }, // OLE2 (旧版 Office)
+  d0cf11e0: { mime: 'application/msword', ext: '.doc' }, // OLE2 (旧版 Office)
   // 音频
   '49443303': { mime: 'audio/mpeg', ext: '.mp3' }, // ID3v2
-  'fff3': { mime: 'audio/mpeg', ext: '.mp3' }, // MP3 frame sync
-  'fff2': { mime: 'audio/mpeg', ext: '.mp3' },
+  fff3: { mime: 'audio/mpeg', ext: '.mp3' }, // MP3 frame sync
+  fff2: { mime: 'audio/mpeg', ext: '.mp3' },
   '664c6143': { mime: 'audio/flac', ext: '.flac' },
   '4f676753': { mime: 'audio/ogg', ext: '.ogg' },
   '52494646a': { mime: 'audio/wav', ext: '.wav' }, // RIFF (WAV)
@@ -128,16 +128,4 @@ export async function validateFileMimeType(
   }
 
   return { valid: false, realMime: detected.mime };
-}
-
-async function hexStartsWith(filePath: string, prefix: string): Promise<boolean> {
-  try {
-    const handle = await fs.open(filePath, 'r');
-    const buffer = Buffer.alloc(16);
-    await handle.read(buffer, 0, 16, 0);
-    await handle.close();
-    return buffer.toString('hex').toLowerCase().startsWith(prefix);
-  } catch {
-    return false;
-  }
 }

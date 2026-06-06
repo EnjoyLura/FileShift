@@ -70,9 +70,7 @@ export function rateLimit(config: RateLimitConfig) {
     // 定期清理
     cleanupStore(windowMs);
 
-    const key = keyGenerator
-      ? keyGenerator(req)
-      : req.ip || req.socket.remoteAddress || 'unknown';
+    const key = keyGenerator ? keyGenerator(req) : req.ip || req.socket.remoteAddress || 'unknown';
 
     const now = Date.now();
     let entry = store.get(key);

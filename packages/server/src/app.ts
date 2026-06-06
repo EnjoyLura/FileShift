@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import express from 'express';
+import express, { type Express } from 'express';
 import type { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -8,7 +8,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { globalLimiter } from './middleware/rateLimit.js';
 import { logger } from './utils/logger.js';
 
-const app = express();
+const app: Express = express();
 
 // 代理信任（获取真实 IP）
 app.set('trust proxy', 1);

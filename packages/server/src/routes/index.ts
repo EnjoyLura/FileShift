@@ -1,14 +1,15 @@
 import { Router } from 'express';
-import type { Request, Response } from 'express';
+import type { Request, Response, Router as RouterType } from 'express';
 import { ErrorCodes, ALL_TOOLS, type ApiResponse, type ToolCategory } from '@fileshift/shared';
 import { testConnection } from '../config/database.js';
 import { testRedisConnection } from '../config/redis.js';
 import { authRouter } from './auth.routes.js';
+import { userRouter } from './user.routes.js';
 import { fileRouter } from './file.routes.js';
 import { taskRouter } from './task.routes.js';
 import { pointsRouter } from './points.routes.js';
 
-const router = Router();
+const router: RouterType = Router();
 
 // ========== 公开路由 ==========
 
@@ -70,7 +71,7 @@ router.get('/v1/tools', (req: Request, res: Response) => {
 router.use('/v1/auth', authRouter);
 
 // 用户相关：/api/v1/user/*
-router.use('/v1/user', authRouter);
+router.use('/v1/user', userRouter);
 
 // ========== 文件路由 ==========
 

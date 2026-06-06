@@ -5,10 +5,10 @@
     "rootDir": "./src",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "declaration": false,
+    "declarationMap": false,
     "types": ["node"]
   },
   "include": ["src"],
-  "references": [
-    { "path": "../shared" }
-  ]
+  "references": [{ "path": "../shared" }]
 }

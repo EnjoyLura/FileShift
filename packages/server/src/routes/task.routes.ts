@@ -1,16 +1,12 @@
 import { Router } from 'express';
-import type { Request, Response } from 'express';
+import type { Request, Response, Router as RouterType } from 'express';
 import { z } from 'zod';
 import { ErrorCodes, type ApiResponse } from '@fileshift/shared';
 import { authMiddleware } from '../middleware/auth.js';
 import { AppError } from '../middleware/errorHandler.js';
-import {
-  createTask,
-  getTaskDetail,
-  getTaskList,
-} from '../services/task.service.js';
+import { createTask, getTaskDetail, getTaskList } from '../services/task.service.js';
 
-const router = Router();
+const router: RouterType = Router();
 
 // 所有任务操作需要登录
 router.use(authMiddleware);

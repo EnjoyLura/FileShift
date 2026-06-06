@@ -83,13 +83,7 @@ function fileFilter(
   cb: multer.FileFilterCallback
 ) {
   if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
-    cb(
-      new AppError(
-        ErrorCodes.UNSUPPORTED_FORMAT,
-        `不支持的文件格式: ${file.mimetype}`,
-        422
-      )
-    );
+    cb(new AppError(ErrorCodes.UNSUPPORTED_FORMAT, `不支持的文件格式: ${file.mimetype}`, 422));
     return;
   }
   cb(null, true);

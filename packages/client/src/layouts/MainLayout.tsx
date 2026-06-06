@@ -81,8 +81,18 @@ export function MainLayout() {
 
   // 用户下拉菜单
   const userMenuItems: MenuProps['items'] = [
-    { key: 'profile', icon: <UserOutlined />, label: '个人中心', onClick: () => navigate('/profile') },
-    { key: 'points', icon: <GiftOutlined />, label: '积分中心', onClick: () => navigate('/points') },
+    {
+      key: 'profile',
+      icon: <UserOutlined />,
+      label: '个人中心',
+      onClick: () => navigate('/profile'),
+    },
+    {
+      key: 'points',
+      icon: <GiftOutlined />,
+      label: '积分中心',
+      onClick: () => navigate('/points'),
+    },
     { type: 'divider' },
     { key: 'logout', icon: <LogoutOutlined />, label: '退出登录', danger: true, onClick: logout },
   ];
@@ -94,13 +104,23 @@ export function MainLayout() {
       <Layout className="min-h-screen">
         {/* 顶部导航栏 */}
         <Header className="flex items-center justify-between bg-white px-4 shadow-sm h-12 leading-[48px]">
-          <Text strong className="text-primary-600 text-base" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+          <Text
+            strong
+            className="text-primary-600 text-base"
+            onClick={() => navigate('/')}
+            style={{ cursor: 'pointer' }}
+          >
             FileShift
           </Text>
           {isLoggedIn ? (
             <PointsBadge />
           ) : (
-            <Button type="primary" size="small" icon={<LoginOutlined />} onClick={() => navigate('/login')}>
+            <Button
+              type="primary"
+              size="small"
+              icon={<LoginOutlined />}
+              onClick={() => navigate('/login')}
+            >
               登录
             </Button>
           )}

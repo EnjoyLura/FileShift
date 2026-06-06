@@ -127,7 +127,7 @@ export async function createTask(
   );
 
   return {
-    taskId: task.id,
+    id: task.id,
     status: task.status,
     pointsConsumed: pointsCost,
     estimatedTime: 30, // 预估处理时间（秒）
@@ -160,14 +160,14 @@ export async function getTaskDetail(taskId: string, userId: string) {
   }
 
   return {
-    taskId: task.id,
+    id: task.id,
     status: task.status,
     progress: task.progress,
     tool: task.tool,
     inputFile: task.inputFile,
     outputFile: task.outputFile
       ? {
-          fileId: task.outputFile.id,
+          id: task.outputFile.id,
           originalName: task.outputFile.originalName,
           size: task.outputFile.size,
           downloadUrl: `/api/v1/files/${task.outputFile.id}/download`,
@@ -213,14 +213,15 @@ export async function getTaskList(
 
   return {
     list: tasks.map((task) => ({
-      taskId: task.id,
+      id: task.id,
+      toolId: task.toolId,
       status: task.status,
       progress: task.progress,
       tool: task.tool,
-      inputFileName: task.inputFile.originalName,
+      inputFile: { originalName: task.inputFile.originalName },
       outputFile: task.outputFile
         ? {
-            fileId: task.outputFile.id,
+            id: task.outputFile.id,
             originalName: task.outputFile.originalName,
             size: task.outputFile.size,
             downloadUrl: `/api/v1/files/${task.outputFile.id}/download`,

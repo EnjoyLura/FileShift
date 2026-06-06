@@ -41,7 +41,6 @@ const CATEGORY_TABS: CategoryTab[] = [
 // ========== HomePage ==========
 
 export default function HomePage() {
-
   // 工具数据
   const [tools, setTools] = useState<ToolConfig[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,15 +72,17 @@ export default function HomePage() {
     }
 
     fetchTools();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // ========== 热门推荐工具 ==========
 
   const featuredTools = useMemo(() => {
-    return FEATURED_TOOL_IDS
-      .map((id) => tools.find((t) => t.id === id))
-      .filter(Boolean) as ToolConfig[];
+    return FEATURED_TOOL_IDS.map((id) => tools.find((t) => t.id === id)).filter(
+      Boolean
+    ) as ToolConfig[];
   }, [tools]);
 
   // ========== 筛选后的工具列表 ==========
@@ -192,9 +193,7 @@ export default function HomePage() {
               全部工具
             </Title>
           </div>
-          <span className="text-xs text-gray-400">
-            {filteredTools.length} 个工具
-          </span>
+          <span className="text-xs text-gray-400">{filteredTools.length} 个工具</span>
         </div>
 
         {/* 分类 Tab */}

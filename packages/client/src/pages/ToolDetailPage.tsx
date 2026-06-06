@@ -117,7 +117,9 @@ export default function ToolDetailPage() {
     }
 
     loadTool();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   // ========== 文件已上传成功 → 进入 ready 阶段 ==========
@@ -172,7 +174,19 @@ export default function ToolDetailPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [tool, id, selectedFile, outputFormat, quality, needsOutputFormat, needsQuality, taskState.uploadedFile, uploadFile, submitTask, user]);
+  }, [
+    tool,
+    id,
+    selectedFile,
+    outputFormat,
+    quality,
+    needsOutputFormat,
+    needsQuality,
+    taskState.uploadedFile,
+    uploadFile,
+    submitTask,
+    user,
+  ]);
 
   // ========== 积分不足检查 ==========
 
@@ -205,7 +219,14 @@ export default function ToolDetailPage() {
     }
 
     setConfirmOpen(true);
-  }, [hasEnoughPoints, user?.points, tool?.pointsCost, selectedFile, taskState.uploadedFile, navigate]);
+  }, [
+    hasEnoughPoints,
+    user?.points,
+    tool?.pointsCost,
+    selectedFile,
+    taskState.uploadedFile,
+    navigate,
+  ]);
 
   // ========== 下载 ==========
 
@@ -292,96 +313,98 @@ export default function ToolDetailPage() {
 
       {/* ========== 非处理阶段：上传 + 参数配置 ========== */}
       {taskState.phase !== 'processing' &&
-       taskState.phase !== 'completed' &&
-       taskState.phase !== 'failed' && (
-        <>
-          {/* 文件上传区 */}
-          <Card className="mb-6" title="1. 上传文件">
-            <FileUploader
-              file={selectedFile}
-              onFileChange={(f) => {
-                setSelectedFile(f);
-                if (!f) resetTask();
-              }}
-              acceptFormats={tool.inputFormats}
-              maxSize={tool.maxFileSize}
-              disabled={isProcessing}
-              uploadedFileId={taskState.uploadedFile?.fileId}
-            />
-          </Card>
-
-          {/* 参数配置面板 */}
-          {(needsOutputFormat || needsQuality) && (
-            <Card className="mb-6" title="2. 参数设置">
-              {/* 输出格式选择 */}
-              {needsOutputFormat && (
-                <div className="mb-4">
-                  <Text strong className="block mb-3">输出格式</Text>
-                  <Radio.Group
-                    value={outputFormat}
-                    onChange={(e) => setOutputFormat(e.target.value)}
-                    disabled={isProcessing}
-                    optionType="button"
-                    buttonStyle="solid"
-                  >
-                    {tool.outputFormats.map((fmt) => (
-                      <Radio.Button key={fmt} value={fmt}>
-                        {fmt.toUpperCase()}
-                      </Radio.Button>
-                    ))}
-                  </Radio.Group>
-                </div>
-              )}
-
-              {/* 质量滑块 */}
-              {needsQuality && (
-                <div>
-                  <Text strong className="block mb-3">
-                    压缩质量：{quality}%
-                  </Text>
-                  <Slider
-                    min={10}
-                    max={100}
-                    value={quality}
-                    onChange={setQuality}
-                    disabled={isProcessing}
-                    marks={{ 10: '10', 50: '50', 100: '100' }}
-                  />
-                  <Text type="secondary" className="text-xs">
-                    数值越高，文件越大但质量越好；数值越低，文件越小但画质降低
-                  </Text>
-                </div>
-              )}
+        taskState.phase !== 'completed' &&
+        taskState.phase !== 'failed' && (
+          <>
+            {/* 文件上传区 */}
+            <Card className="mb-6" title="1. 上传文件">
+              <FileUploader
+                file={selectedFile}
+                onFileChange={(f) => {
+                  setSelectedFile(f);
+                  if (!f) resetTask();
+                }}
+                acceptFormats={tool.inputFormats}
+                maxSize={tool.maxFileSize}
+                disabled={isProcessing}
+                uploadedFileId={taskState.uploadedFile?.fileId}
+              />
             </Card>
-          )}
 
-          {/* 操作按钮 */}
-          <div className="flex justify-center gap-4 mt-8 mb-12">
-            <Button
-              type="primary"
-              size="large"
-              icon={<SwapOutlined />}
-              onClick={handleStartConvert}
-              loading={isProcessing}
-              disabled={!selectedFile && !taskState.uploadedFile}
-              className="min-w-[180px] h-12 text-base"
-            >
-              开始转换
-            </Button>
-          </div>
+            {/* 参数配置面板 */}
+            {(needsOutputFormat || needsQuality) && (
+              <Card className="mb-6" title="2. 参数设置">
+                {/* 输出格式选择 */}
+                {needsOutputFormat && (
+                  <div className="mb-4">
+                    <Text strong className="block mb-3">
+                      输出格式
+                    </Text>
+                    <Radio.Group
+                      value={outputFormat}
+                      onChange={(e) => setOutputFormat(e.target.value)}
+                      disabled={isProcessing}
+                      optionType="button"
+                      buttonStyle="solid"
+                    >
+                      {tool.outputFormats.map((fmt) => (
+                        <Radio.Button key={fmt} value={fmt}>
+                          {fmt.toUpperCase()}
+                        </Radio.Button>
+                      ))}
+                    </Radio.Group>
+                  </div>
+                )}
 
-          {/* 错误提示 */}
-          {taskState.phase === 'error' && taskState.error && (
-            <div className="text-center -mt-4 mb-12">
-              <Text type="danger">{taskState.error}</Text>
-              <br />
-              <Button type="link" onClick={handleReset} className="mt-2">
-                重新上传
+                {/* 质量滑块 */}
+                {needsQuality && (
+                  <div>
+                    <Text strong className="block mb-3">
+                      压缩质量：{quality}%
+                    </Text>
+                    <Slider
+                      min={10}
+                      max={100}
+                      value={quality}
+                      onChange={setQuality}
+                      disabled={isProcessing}
+                      marks={{ 10: '10', 50: '50', 100: '100' }}
+                    />
+                    <Text type="secondary" className="text-xs">
+                      数值越高，文件越大但质量越好；数值越低，文件越小但画质降低
+                    </Text>
+                  </div>
+                )}
+              </Card>
+            )}
+
+            {/* 操作按钮 */}
+            <div className="flex justify-center gap-4 mt-8 mb-12">
+              <Button
+                type="primary"
+                size="large"
+                icon={<SwapOutlined />}
+                onClick={handleStartConvert}
+                loading={isProcessing}
+                disabled={!selectedFile && !taskState.uploadedFile}
+                className="min-w-[180px] h-12 text-base"
+              >
+                开始转换
               </Button>
             </div>
-          )}
-        </>
-      )}
+
+            {/* 错误提示 */}
+            {taskState.phase === 'error' && taskState.error && (
+              <div className="text-center -mt-4 mb-12">
+                <Text type="danger">{taskState.error}</Text>
+                <br />
+                <Button type="link" onClick={handleReset} className="mt-2">
+                  重新上传
+                </Button>
+              </div>
+            )}
+          </>
+        )}
 
       {/* ========== 处理中 ========== */}
       {(taskState.phase === 'processing' || taskState.phase === 'submitting') && (
@@ -439,11 +462,7 @@ export default function ToolDetailPage() {
                     {formatSize(taskState.task.outputFile.size)}
                   </Text>
                 </div>
-                <Button
-                  type="primary"
-                  icon={<DownloadOutlined />}
-                  onClick={handleDownload}
-                >
+                <Button type="primary" icon={<DownloadOutlined />} onClick={handleDownload}>
                   下载文件
                 </Button>
               </div>

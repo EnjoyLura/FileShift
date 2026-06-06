@@ -59,7 +59,9 @@ interface ToolCardProps {
  */
 export default function ToolCard({ tool, featured }: ToolCardProps) {
   const navigate = useNavigate();
-  const icon = categoryIconMap[tool.category] ?? <SwapOutlined className="text-2xl text-gray-400" />;
+  const icon = categoryIconMap[tool.category] ?? (
+    <SwapOutlined className="text-2xl text-gray-400" />
+  );
   const categoryColor = categoryColorMap[tool.category] ?? 'default';
   const categoryLabel = categoryLabelMap[tool.category] ?? tool.category;
 
@@ -67,7 +69,9 @@ export default function ToolCard({ tool, featured }: ToolCardProps) {
     <Card
       hoverable
       className={`tool-card transition-all duration-200 h-full ${featured ? 'border-primary-300 shadow-primary-100' : ''}`}
-      styles={{ body: { padding: '16px', display: 'flex', flexDirection: 'column', height: '100%' } }}
+      styles={{
+        body: { padding: '16px', display: 'flex', flexDirection: 'column', height: '100%' },
+      }}
       onClick={() => navigate(`/tools/${tool.id}`)}
     >
       {/* 图标 + 分类标签 */}
@@ -97,9 +101,7 @@ export default function ToolCard({ tool, featured }: ToolCardProps) {
 
       {/* 底部信息：积分 + 文件大小限制 */}
       <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-        <Text className="text-xs text-primary-600 font-medium">
-          {tool.pointsCost} 积分
-        </Text>
+        <Text className="text-xs text-primary-600 font-medium">{tool.pointsCost} 积分</Text>
         <Text type="secondary" className="text-xs">
           ≤ {formatFileSize(tool.maxFileSize)}
         </Text>

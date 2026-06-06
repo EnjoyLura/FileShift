@@ -286,7 +286,7 @@ export async function logout(refreshToken: string) {
     // 计算剩余有效期
     const now = Math.floor(Date.now() / 1000);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const ttl = ((payload as any).exp as number || now) - now;
+    const ttl = (((payload as any).exp as number) || now) - now;
     if (ttl > 0) {
       await blacklistRefreshToken(refreshToken, ttl);
     }

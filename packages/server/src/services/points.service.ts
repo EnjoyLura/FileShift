@@ -231,10 +231,7 @@ export async function signIn(userId: string) {
     };
   });
 
-  logger.info(
-    { userId, ...result },
-    'User signed in'
-  );
+  logger.info({ userId, ...result }, 'User signed in');
 
   return result;
 }

@@ -253,10 +253,7 @@ export async function imageCompressProcessor(data: TaskJobData): Promise<string>
       withoutEnlargement: true,
       fit: 'inside',
     });
-    logger.info(
-      { from: inputMeta.width, to: config.maxWidth },
-      'Resizing large image'
-    );
+    logger.info({ from: inputMeta.width, to: config.maxWidth }, 'Resizing large image');
   }
 
   // 生成输出文件名（保持原格式）
@@ -329,9 +326,7 @@ export async function imageCompressProcessor(data: TaskJobData): Promise<string>
   // 验证输出
   const outputStats = fs.statSync(outputPath);
   const outputMeta = await sharp(outputPath).metadata();
-  const ratio = originalSize
-    ? ((1 - outputStats.size / originalSize) * 100).toFixed(1)
-    : 'N/A';
+  const ratio = originalSize ? ((1 - outputStats.size / originalSize) * 100).toFixed(1) : 'N/A';
 
   logger.info(
     {

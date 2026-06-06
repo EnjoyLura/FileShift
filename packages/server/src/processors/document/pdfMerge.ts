@@ -17,7 +17,7 @@ import { prisma } from '../../config/database.js';
  * 3. 输出合并后的 PDF
  */
 export async function pdfMergeProcessor(data: TaskJobData): Promise<string> {
-  const { inputFilePath, outputDir, params, taskId } = data;
+  const { inputFilePath, outputDir, params } = data;
 
   logger.info({ inputFilePath, params }, 'PDF merge processor started');
 
@@ -59,7 +59,10 @@ export async function pdfMergeProcessor(data: TaskJobData): Promise<string> {
     try {
       const pdf = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
       const pageCount = pdf.getPageCount();
-      const pages = await mergedPdf.copyPages(pdf, Array.from({ length: pageCount }, (_, j) => j));
+      const pages = await mergedPdf.copyPages(
+        pdf,
+        Array.from({ length: pageCount }, (_, j) => j)
+      );
 
       for (const page of pages) {
         mergedPdf.addPage(page);
@@ -69,7 +72,9 @@ export async function pdfMergeProcessor(data: TaskJobData): Promise<string> {
       logger.info({ fileIndex: i, pages: pageCount }, 'Merged PDF file');
     } catch (error) {
       logger.error({ filePath, error }, 'Failed to load PDF file');
-      throw new Error(`无法加载第 ${i + 1} 个 PDF 文件: ${error instanceof Error ? error.message : '未知错误'}`);
+      throw new Error(
+        `无法加载第 ${i + 1} 个 PDF 文件: ${error instanceof Error ? error.message : '未知错误'}`
+      );
     }
   }
 

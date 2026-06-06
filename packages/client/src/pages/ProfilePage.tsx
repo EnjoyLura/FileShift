@@ -91,11 +91,18 @@ export default function ProfilePage() {
 
   // ========== 使用记录 ==========
 
-  const [taskList, setTaskList] = useState<Array<{
-    id: string; status: TaskStatus; toolId: string; toolName: string;
-    inputFileName: string; outputFile: { id: string; originalName: string } | null;
-    pointsConsumed: number; createdAt: string;
-  }>>([]);
+  const [taskList, setTaskList] = useState<
+    Array<{
+      id: string;
+      status: TaskStatus;
+      toolId: string;
+      toolName: string;
+      inputFileName: string;
+      outputFile: { id: string; originalName: string } | null;
+      pointsConsumed: number;
+      createdAt: string;
+    }>
+  >([]);
   const [taskLoading, setTaskLoading] = useState(false);
   const [taskPage, setTaskPage] = useState(1);
   const [taskTotal, setTaskTotal] = useState(0);
@@ -108,7 +115,9 @@ export default function ProfilePage() {
   // ========== 邀请 ==========
 
   const [inviteInfo, setInviteInfo] = useState<{
-    inviteCode: string; inviteCount: number; totalReward: number;
+    inviteCode: string;
+    inviteCount: number;
+    totalReward: number;
   } | null>(null);
   const [inviteLoading, setInviteLoading] = useState(false);
 
@@ -117,23 +126,38 @@ export default function ProfilePage() {
   const loadTaskList = useCallback(async (page: number) => {
     setTaskLoading(true);
     try {
-      const res = await get<PaginatedResponse<{
-        id: string; status: TaskStatus; toolId: string; tool: { name: string };
-        inputFile: { originalName: string };
-        outputFile: { id: string; originalName: string } | null;
-        pointsConsumed: number; createdAt: string;
-      }>>('/v1/tasks', { page, pageSize: 10 });
+      const res = await get<
+        PaginatedResponse<{
+          id: string;
+          status: TaskStatus;
+          toolId: string;
+          tool: { name: string };
+          inputFile: { originalName: string };
+          outputFile: { id: string; originalName: string } | null;
+          pointsConsumed: number;
+          createdAt: string;
+        }>
+      >('/v1/tasks', { page, pageSize: 10 });
       if (res.code === 0 && res.data) {
-        setTaskList(res.data.list.map((t) => ({
-          id: t.id, status: t.status, toolId: t.toolId, toolName: t.tool?.name ?? t.toolId,
-          inputFileName: t.inputFile?.originalName ?? '-',
-          outputFile: t.outputFile,
-          pointsConsumed: t.pointsConsumed, createdAt: t.createdAt,
-        })));
+        setTaskList(
+          res.data.list.map((t) => ({
+            id: t.id,
+            status: t.status,
+            toolId: t.toolId,
+            toolName: t.tool?.name ?? t.toolId,
+            inputFileName: t.inputFile?.originalName ?? '-',
+            outputFile: t.outputFile,
+            pointsConsumed: t.pointsConsumed,
+            createdAt: t.createdAt,
+          }))
+        );
         setTaskTotal(res.data.total);
       }
-    } catch { /* ignore */ }
-    finally { setTaskLoading(false); }
+    } catch {
+      /* ignore */
+    } finally {
+      setTaskLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -146,7 +170,9 @@ export default function ProfilePage() {
     if (activeTab !== 'vip') return;
     setVipLoading(true);
     get<PointsPackage[]>('/v1/points/vip-packages')
-      .then((res) => { if (res.code === 0 && res.data) setVipPackages(res.data); })
+      .then((res) => {
+        if (res.code === 0 && res.data) setVipPackages(res.data);
+      })
       .catch(() => {})
       .finally(() => setVipLoading(false));
   }, [activeTab]);
@@ -157,7 +183,9 @@ export default function ProfilePage() {
     if (activeTab !== 'invite') return;
     setInviteLoading(true);
     get<{ inviteCode: string; inviteCount: number; totalReward: number }>('/v1/points/invite')
-      .then((res) => { if (res.code === 0 && res.data) setInviteInfo(res.data); })
+      .then((res) => {
+        if (res.code === 0 && res.data) setInviteInfo(res.data);
+      })
       .catch(() => {})
       .finally(() => setInviteLoading(false));
   }, [activeTab]);
@@ -171,14 +199,19 @@ export default function ProfilePage() {
     }
     setNicknameSaving(true);
     try {
-      const res = await put<{ nickname: string }>('/v1/user/profile', { nickname: nicknameInput.trim() });
+      const res = await put<{ nickname: string }>('/v1/user/profile', {
+        nickname: nicknameInput.trim(),
+      });
       if (res.code === 0) {
         if (user) setUser({ ...user, nickname: nicknameInput.trim() });
         message.success('昵称修改成功');
         setEditNicknameOpen(false);
       }
-    } catch { message.error('修改失败'); }
-    finally { setNicknameSaving(false); }
+    } catch {
+      message.error('修改失败');
+    } finally {
+      setNicknameSaving(false);
+    }
   }, [nicknameInput, user, setUser]);
 
   // ========== 复制邀请码 ==========
@@ -196,7 +229,12 @@ export default function ProfilePage() {
   const tabItems = [
     {
       key: 'account',
-      label: <span><UserOutlined className="mr-1" />账户信息</span>,
+      label: (
+        <span>
+          <UserOutlined className="mr-1" />
+          账户信息
+        </span>
+      ),
       children: (
         <Card>
           {/* 头像 + 昵称 */}
@@ -204,47 +242,111 @@ export default function ProfilePage() {
             <Avatar size={64} icon={<UserOutlined />} className="bg-primary-500" />
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Text strong className="text-lg">{user?.nickname || '用户'}</Text>
+                <Text strong className="text-lg">
+                  {user?.nickname || '用户'}
+                </Text>
                 {user?.vipType && (
-                  <Tag color="gold" icon={<CrownOutlined />}>{user.vipType}</Tag>
+                  <Tag color="gold" icon={<CrownOutlined />}>
+                    {user.vipType}
+                  </Tag>
                 )}
                 <Button
-                  type="link" size="small" icon={<EditOutlined />}
-                  onClick={() => { setNicknameInput(user?.nickname || ''); setEditNicknameOpen(true); }}
+                  type="link"
+                  size="small"
+                  icon={<EditOutlined />}
+                  onClick={() => {
+                    setNicknameInput(user?.nickname || '');
+                    setEditNicknameOpen(true);
+                  }}
                 />
               </div>
-              <Text type="secondary" className="text-sm">ID: {user?.id?.slice(0, 12)}...</Text>
+              <Text type="secondary" className="text-sm">
+                ID: {user?.id?.slice(0, 12)}...
+              </Text>
             </div>
           </div>
 
           <Descriptions column={1} size="small" className="mb-4">
-            <Descriptions.Item label={<><MailOutlined className="mr-1" />邮箱</>}>
+            <Descriptions.Item
+              label={
+                <>
+                  <MailOutlined className="mr-1" />
+                  邮箱
+                </>
+              }
+            >
               {user?.email ? (
-                <span>{user.email} <Tag color="green" className="ml-1">已绑定</Tag></span>
-              ) : <Text type="secondary">未绑定</Text>}
+                <span>
+                  {user.email}{' '}
+                  <Tag color="green" className="ml-1">
+                    已绑定
+                  </Tag>
+                </span>
+              ) : (
+                <Text type="secondary">未绑定</Text>
+              )}
             </Descriptions.Item>
-            <Descriptions.Item label={<><PhoneOutlined className="mr-1" />手机号</>}>
+            <Descriptions.Item
+              label={
+                <>
+                  <PhoneOutlined className="mr-1" />
+                  手机号
+                </>
+              }
+            >
               {user?.phone ? (
-                <span>{user.phone} <Tag color="green" className="ml-1">已绑定</Tag></span>
-              ) : <Text type="secondary">未绑定</Text>}
+                <span>
+                  {user.phone}{' '}
+                  <Tag color="green" className="ml-1">
+                    已绑定
+                  </Tag>
+                </span>
+              ) : (
+                <Text type="secondary">未绑定</Text>
+              )}
             </Descriptions.Item>
-            <Descriptions.Item label={<><GiftOutlined className="mr-1" />积分</>}>
-              <Text strong className="text-primary-600">{user?.points ?? 0}</Text>
+            <Descriptions.Item
+              label={
+                <>
+                  <GiftOutlined className="mr-1" />
+                  积分
+                </>
+              }
+            >
+              <Text strong className="text-primary-600">
+                {user?.points ?? 0}
+              </Text>
             </Descriptions.Item>
-            <Descriptions.Item label={<><CrownOutlined className="mr-1" />VIP</>}>
+            <Descriptions.Item
+              label={
+                <>
+                  <CrownOutlined className="mr-1" />
+                  VIP
+                </>
+              }
+            >
               {user?.vipType ? (
                 <Tag color="gold">{user.vipType}</Tag>
-              ) : <Text type="secondary">普通用户</Text>}
+              ) : (
+                <Text type="secondary">普通用户</Text>
+              )}
             </Descriptions.Item>
           </Descriptions>
 
-          <Button danger onClick={logout}>退出登录</Button>
+          <Button danger onClick={logout}>
+            退出登录
+          </Button>
         </Card>
       ),
     },
     {
       key: 'history',
-      label: <span><SyncOutlined className="mr-1" />使用记录</span>,
+      label: (
+        <span>
+          <SyncOutlined className="mr-1" />
+          使用记录
+        </span>
+      ),
       children: (
         <Card>
           <Table
@@ -260,23 +362,47 @@ export default function ProfilePage() {
               showTotal: (t) => `共 ${t} 条`,
             }}
             columns={[
-              { title: '时间', dataIndex: 'createdAt', width: 160, render: (v: string) => formatTime(v) },
+              {
+                title: '时间',
+                dataIndex: 'createdAt',
+                width: 160,
+                render: (v: string) => formatTime(v),
+              },
               { title: '工具', dataIndex: 'toolName', ellipsis: true },
               {
-                title: '状态', dataIndex: 'status', width: 100,
+                title: '状态',
+                dataIndex: 'status',
+                width: 100,
                 render: (s: TaskStatus) => {
                   const cfg = taskStatusConfig[s] ?? taskStatusConfig[TaskStatus.PENDING];
-                  return <Tag color={cfg.color} icon={cfg.icon}>{cfg.label}</Tag>;
+                  return (
+                    <Tag color={cfg.color} icon={cfg.icon}>
+                      {cfg.label}
+                    </Tag>
+                  );
                 },
               },
-              { title: '消费', dataIndex: 'pointsConsumed', width: 80, render: (v: number) => `${v} 积分` },
               {
-                title: '操作', key: 'action', width: 100,
-                render: (_: unknown, record: typeof taskList[0]) => {
+                title: '消费',
+                dataIndex: 'pointsConsumed',
+                width: 80,
+                render: (v: number) => `${v} 积分`,
+              },
+              {
+                title: '操作',
+                key: 'action',
+                width: 100,
+                render: (_: unknown, record: (typeof taskList)[0]) => {
                   if (record.status === TaskStatus.COMPLETED && record.outputFile) {
                     return (
-                      <Button type="link" size="small" icon={<DownloadOutlined />}
-                        onClick={() => downloadFile(record.outputFile!.id, record.outputFile!.originalName)}>
+                      <Button
+                        type="link"
+                        size="small"
+                        icon={<DownloadOutlined />}
+                        onClick={() =>
+                          downloadFile(record.outputFile!.id, record.outputFile!.originalName)
+                        }
+                      >
                         下载
                       </Button>
                     );
@@ -293,47 +419,63 @@ export default function ProfilePage() {
     },
     {
       key: 'vip',
-      label: <span><CrownOutlined className="mr-1" />VIP</span>,
+      label: (
+        <span>
+          <CrownOutlined className="mr-1" />
+          VIP
+        </span>
+      ),
       children: (
         <Card>
           {user?.vipType && (
             <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <Text strong className="text-yellow-700">当前 VIP：{user.vipType}</Text>
+              <Text strong className="text-yellow-700">
+                当前 VIP：{user.vipType}
+              </Text>
             </div>
           )}
-          {vipLoading ? <Spin /> : (
-            vipPackages.length === 0 ? (
-              <Empty description="暂无VIP套餐" />
-            ) : (
-              <Row gutter={[16, 16]}>
-                {vipPackages.map((pkg) => (
-                  <Col key={pkg.id} xs={24} sm={12} md={8}>
-                    <Card hoverable className="text-center border-primary-100">
-                      <CrownOutlined className="text-3xl text-yellow-500 mb-2" />
-                      <Title level={5}>{pkg.name}</Title>
-                      <Text className="text-2xl font-bold text-primary-600 block mb-1">
-                        {pkg.priceDisplay}
-                      </Text>
-                      <Text type="secondary" className="text-sm">{pkg.description}</Text>
-                      <br />
-                      <Button type="primary" className="mt-3" disabled>
-                        暂未开放
-                      </Button>
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            )
+          {vipLoading ? (
+            <Spin />
+          ) : vipPackages.length === 0 ? (
+            <Empty description="暂无VIP套餐" />
+          ) : (
+            <Row gutter={[16, 16]}>
+              {vipPackages.map((pkg) => (
+                <Col key={pkg.id} xs={24} sm={12} md={8}>
+                  <Card hoverable className="text-center border-primary-100">
+                    <CrownOutlined className="text-3xl text-yellow-500 mb-2" />
+                    <Title level={5}>{pkg.name}</Title>
+                    <Text className="text-2xl font-bold text-primary-600 block mb-1">
+                      {pkg.priceDisplay}
+                    </Text>
+                    <Text type="secondary" className="text-sm">
+                      {pkg.description}
+                    </Text>
+                    <br />
+                    <Button type="primary" className="mt-3" disabled>
+                      暂未开放
+                    </Button>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
           )}
         </Card>
       ),
     },
     {
       key: 'invite',
-      label: <span><ShareAltOutlined className="mr-1" />邀请好友</span>,
+      label: (
+        <span>
+          <ShareAltOutlined className="mr-1" />
+          邀请好友
+        </span>
+      ),
       children: (
         <Card>
-          {inviteLoading ? <Spin /> : inviteInfo ? (
+          {inviteLoading ? (
+            <Spin />
+          ) : inviteInfo ? (
             <>
               <Row gutter={[24, 16]} className="mb-6">
                 <Col xs={12} sm={8}>
@@ -346,15 +488,23 @@ export default function ProfilePage() {
               <div className="p-4 bg-gray-50 rounded-lg">
                 <Text strong>我的邀请码</Text>
                 <div className="flex items-center gap-3 mt-2">
-                  <Input value={inviteInfo.inviteCode} readOnly className="text-lg font-mono text-center !w-48" />
-                  <Button icon={<CopyOutlined />} onClick={handleCopyInvite}>复制</Button>
+                  <Input
+                    value={inviteInfo.inviteCode}
+                    readOnly
+                    className="text-lg font-mono text-center !w-48"
+                  />
+                  <Button icon={<CopyOutlined />} onClick={handleCopyInvite}>
+                    复制
+                  </Button>
                 </div>
                 <Text type="secondary" className="text-xs mt-2 block">
                   好友注册时输入邀请码，双方各得 20 积分
                 </Text>
               </div>
             </>
-          ) : <Empty description="加载失败" />}
+          ) : (
+            <Empty description="加载失败" />
+          )}
         </Card>
       ),
     },
@@ -364,7 +514,9 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
-      <Title level={4} className="!mb-4">个人中心</Title>
+      <Title level={4} className="!mb-4">
+        个人中心
+      </Title>
 
       {/* 移动端：横向滚动 Tab */}
       <div className="md:hidden mb-4">
@@ -405,9 +557,7 @@ export default function ProfilePage() {
         </div>
 
         {/* 右侧内容 */}
-        <div className="flex-1 min-w-0">
-          {tabItems.find((t) => t.key === activeTab)?.children}
-        </div>
+        <div className="flex-1 min-w-0">{tabItems.find((t) => t.key === activeTab)?.children}</div>
       </div>
 
       {/* 昵称编辑弹窗 */}

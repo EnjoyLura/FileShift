@@ -1,8 +1,5 @@
 import { createWorker, type ProcessorFn } from './base.worker.js';
-import {
-  imageConvertProcessor,
-  imageCompressProcessor,
-} from '../processors/image/convert.js';
+import { imageConvertProcessor, imageCompressProcessor } from '../processors/image/convert.js';
 
 /**
  * 图片处理器映射

@@ -6,14 +6,14 @@ import type { TaskDetail, UploadFileResponse } from '@fileshift/shared';
 // ========== 任务生命周期状态 ==========
 
 export type TaskPhase =
-  | 'idle'         // 初始状态
-  | 'uploading'    // 文件上传中
-  | 'error'        // 出错（可恢复）
-  | 'ready'        // 文件已上传，等待配置/提交
-  | 'submitting'   // 创建任务中
-  | 'processing'   // 任务处理中（轮询中）
-  | 'completed'    // 任务完成
-  | 'failed';      // 任务失败
+  | 'idle' // 初始状态
+  | 'uploading' // 文件上传中
+  | 'error' // 出错（可恢复）
+  | 'ready' // 文件已上传，等待配置/提交
+  | 'submitting' // 创建任务中
+  | 'processing' // 任务处理中（轮询中）
+  | 'completed' // 任务完成
+  | 'failed'; // 任务失败
 
 export interface TaskState {
   phase: TaskPhase;
@@ -67,50 +67,46 @@ export function useTask() {
 
   // ========== 上传文件 ==========
 
-  const uploadFile = useCallback(
-    async (file: File, toolId?: string): Promise<boolean> => {
-      setState((s) => ({ ...s, phase: 'uploading', error: null }));
+  const uploadFile = useCallback(async (file: File, toolId?: string): Promise<boolean> => {
+    setState((s) => ({ ...s, phase: 'uploading', error: null }));
 
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
-        if (toolId) formData.append('toolId', toolId);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      if (toolId) formData.append('toolId', toolId);
 
-        const res = await api.post<{ code: number; message: string; data: UploadFileResponse }>(
-          '/v1/files/upload',
-          formData,
-          {
-            headers: { 'Content-Type': 'multipart/form-data' },
-            timeout: 120_000, // 上传超时 2 分钟
-          }
-        );
-
-        if (res.data.code === 0 && res.data.data) {
-          const { fileId, originalName, size, mimeType } = res.data.data;
-          setState((s) => ({
-            ...s,
-            phase: 'ready',
-            uploadedFile: { fileId, originalName, size, mimeType },
-            error: null,
-          }));
-          return true;
+      const res = await api.post<{ code: number; message: string; data: UploadFileResponse }>(
+        '/v1/files/upload',
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          timeout: 120_000, // 上传超时 2 分钟
         }
+      );
 
+      if (res.data.code === 0 && res.data.data) {
+        const { fileId, originalName, size, mimeType } = res.data.data;
         setState((s) => ({
           ...s,
-          phase: 'error',
-          error: res.data.message || '上传失败',
+          phase: 'ready',
+          uploadedFile: { fileId, originalName, size, mimeType },
+          error: null,
         }));
-        return false;
-      } catch (err: unknown) {
-        const message =
-          err instanceof Error ? err.message : '网络错误，上传失败';
-        setState((s) => ({ ...s, phase: 'error', error: message }));
-        return false;
+        return true;
       }
-    },
-    []
-  );
+
+      setState((s) => ({
+        ...s,
+        phase: 'error',
+        error: res.data.message || '上传失败',
+      }));
+      return false;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : '网络错误，上传失败';
+      setState((s) => ({ ...s, phase: 'error', error: message }));
+      return false;
+    }
+  }, []);
 
   // ========== 轮询任务状态 ==========
 

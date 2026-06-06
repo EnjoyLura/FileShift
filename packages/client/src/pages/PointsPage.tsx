@@ -12,14 +12,14 @@ import {
   Empty,
   message,
 } from 'antd';
-import {
-  GiftOutlined,
-  CalendarOutlined,
-  RiseOutlined,
-  CrownOutlined,
-} from '@ant-design/icons';
+import { GiftOutlined, CalendarOutlined, RiseOutlined, CrownOutlined } from '@ant-design/icons';
 import { PointsTransactionType } from '@fileshift/shared';
-import type { PaginatedResponse, PointsBalance, PointsTransaction, PointsPackage } from '@fileshift/shared';
+import type {
+  PaginatedResponse,
+  PointsBalance,
+  PointsTransaction,
+  PointsPackage,
+} from '@fileshift/shared';
 import { get, post } from '@/services/api';
 import { useAuthStore } from '@/stores/useAuthStore';
 
@@ -79,36 +79,49 @@ export default function PointsPage() {
         setBalance(res.data);
         updatePoints(res.data.balance);
       }
-    } catch { /* ignore */ }
-    finally { setBalanceLoading(false); }
+    } catch {
+      /* ignore */
+    } finally {
+      setBalanceLoading(false);
+    }
   }, [updatePoints]);
 
-  useEffect(() => { loadBalance(); }, [loadBalance]);
+  useEffect(() => {
+    loadBalance();
+  }, [loadBalance]);
 
   // ========== 加载交易流水 ==========
 
   const loadTransactions = useCallback(async (page: number) => {
     setTxLoading(true);
     try {
-      const res = await get<PaginatedResponse<PointsTransaction>>(
-        '/v1/points/transactions', { page, pageSize: 10 }
-      );
+      const res = await get<PaginatedResponse<PointsTransaction>>('/v1/points/transactions', {
+        page,
+        pageSize: 10,
+      });
       if (res.code === 0 && res.data) {
         setTransactions(res.data.list);
         setTxTotal(res.data.total);
       }
-    } catch { /* ignore */ }
-    finally { setTxLoading(false); }
+    } catch {
+      /* ignore */
+    } finally {
+      setTxLoading(false);
+    }
   }, []);
 
-  useEffect(() => { loadTransactions(txPage); }, [txPage, loadTransactions]);
+  useEffect(() => {
+    loadTransactions(txPage);
+  }, [txPage, loadTransactions]);
 
   // ========== 加载积分套餐 ==========
 
   useEffect(() => {
     setPkgLoading(true);
     get<PointsPackage[]>('/v1/points/packages')
-      .then((res) => { if (res.code === 0 && res.data) setPackages(res.data); })
+      .then((res) => {
+        if (res.code === 0 && res.data) setPackages(res.data);
+      })
       .catch(() => {})
       .finally(() => setPkgLoading(false));
   }, []);
@@ -118,9 +131,11 @@ export default function PointsPage() {
   const handleSignIn = useCallback(async () => {
     setSigningIn(true);
     try {
-      const res = await post<{ pointsEarned: number; consecutiveDays: number; bonusEarned: number }>(
-        '/v1/points/sign-in'
-      );
+      const res = await post<{
+        pointsEarned: number;
+        consecutiveDays: number;
+        bonusEarned: number;
+      }>('/v1/points/sign-in');
       if (res.code === 0 && res.data) {
         setSignedToday(true);
         message.success(res.message || '签到成功');
@@ -132,15 +147,18 @@ export default function PointsPage() {
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string } } };
       message.error(axiosErr?.response?.data?.message || '签到失败');
+    } finally {
+      setSigningIn(false);
     }
-    finally { setSigningIn(false); }
   }, [loadBalance]);
 
   // ========== 渲染 ==========
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
-      <Title level={4} className="!mb-6">积分中心</Title>
+      <Title level={4} className="!mb-6">
+        积分中心
+      </Title>
 
       {/* ===== 积分余额卡片 ===== */}
       <Row gutter={[16, 16]} className="mb-6">
@@ -164,8 +182,12 @@ export default function PointsPage() {
           <Card>
             <div className="flex items-center justify-between">
               <div>
-                <Text strong className="block">每日签到</Text>
-                <Text type="secondary" className="text-xs">签到可获积分奖励</Text>
+                <Text strong className="block">
+                  每日签到
+                </Text>
+                <Text type="secondary" className="text-xs">
+                  签到可获积分奖励
+                </Text>
               </div>
               <Button
                 type="primary"
@@ -183,21 +205,36 @@ export default function PointsPage() {
 
       {/* ===== 积分套餐 ===== */}
       <Card
-        title={<span><RiseOutlined className="mr-2" />积分套餐</span>}
+        title={
+          <span>
+            <RiseOutlined className="mr-2" />
+            积分套餐
+          </span>
+        }
         className="mb-6"
       >
-        {pkgLoading ? <Spin /> : packages.length === 0 ? (
+        {pkgLoading ? (
+          <Spin />
+        ) : packages.length === 0 ? (
           <Empty description="暂无套餐" />
         ) : (
           <Row gutter={[16, 16]}>
             {packages.map((pkg) => (
               <Col key={pkg.id} xs={12} sm={6}>
-                <Card hoverable className="text-center border-primary-100" styles={{ body: { padding: '16px' } }}>
-                  <Text strong className="block text-sm mb-1">{pkg.name}</Text>
+                <Card
+                  hoverable
+                  className="text-center border-primary-100"
+                  styles={{ body: { padding: '16px' } }}
+                >
+                  <Text strong className="block text-sm mb-1">
+                    {pkg.name}
+                  </Text>
                   <Text className="text-xl font-bold text-primary-600 block mb-1">
                     {pkg.points}
                   </Text>
-                  <Text type="secondary" className="text-xs">积分</Text>
+                  <Text type="secondary" className="text-xs">
+                    积分
+                  </Text>
                   <br />
                   <Text className="text-sm font-medium">{pkg.priceDisplay}</Text>
                   <br />
@@ -212,7 +249,14 @@ export default function PointsPage() {
       </Card>
 
       {/* ===== 积分流水 ===== */}
-      <Card title={<span><RiseOutlined className="mr-2" />积分流水</span>}>
+      <Card
+        title={
+          <span>
+            <RiseOutlined className="mr-2" />
+            积分流水
+          </span>
+        }
+      >
         <Table
           dataSource={transactions}
           rowKey="id"
@@ -226,16 +270,25 @@ export default function PointsPage() {
             showTotal: (t) => `共 ${t} 条`,
           }}
           columns={[
-            { title: '时间', dataIndex: 'createdAt', width: 170, render: (v: string) => formatTime(v) },
             {
-              title: '类型', dataIndex: 'type', width: 100,
+              title: '时间',
+              dataIndex: 'createdAt',
+              width: 170,
+              render: (v: string) => formatTime(v),
+            },
+            {
+              title: '类型',
+              dataIndex: 'type',
+              width: 100,
               render: (t: PointsTransactionType) => {
                 const cfg = typeLabelMap[t] ?? { label: t, color: 'default' };
                 return <Tag color={cfg.color}>{cfg.label}</Tag>;
               },
             },
             {
-              title: '金额', dataIndex: 'amount', width: 100,
+              title: '金额',
+              dataIndex: 'amount',
+              width: 100,
               render: (v: number) => (
                 <Text type={v >= 0 ? 'success' : 'danger'} strong>
                   {v >= 0 ? `+${v}` : v}
@@ -243,7 +296,9 @@ export default function PointsPage() {
               ),
             },
             {
-              title: '余额', dataIndex: 'balanceAfter', width: 100,
+              title: '余额',
+              dataIndex: 'balanceAfter',
+              width: 100,
               render: (v: number) => <Text>{v}</Text>,
             },
             { title: '说明', dataIndex: 'description', ellipsis: true },
